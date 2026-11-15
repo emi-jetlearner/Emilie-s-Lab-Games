@@ -1,41 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Compass, HelpCircle, Play, RotateCcw, Wind, ShieldCheck, Check, Clock, Scale } from 'lucide-react';
+import { Compass, Play, RotateCcw } from 'lucide-react';
+import { FunFactsSection } from '../../components/FunFactsSection';
 
-interface DroppableObject {
+interface GravityObject {
   id: string;
-  name: string;
+  name: string; // Exact requested names: Apple, Feather, Bricks, Piano, Bowling Ball, Beach Ball, Anvil
   icon: string;
   massKg: number;
-  dragCoeff: number; // aerodynamic drag
+  dragCoeff: number;
   areaM2: number;
-  color: string;
 }
 
-const OBJECTS: DroppableObject[] = [
-  { id: 'apple', name: "Emilie's Apple", icon: '🍎', massKg: 0.18, dragCoeff: 0.47, areaM2: 0.005, color: '#EF4444' },
-  { id: 'feather', name: 'Falcon Feather', icon: '🪶', massKg: 0.002, dragCoeff: 1.2, areaM2: 0.008, color: '#F8FAFC' },
-  { id: 'bowling', name: 'Bowling Ball', icon: '🎳', massKg: 7.25, dragCoeff: 0.47, areaM2: 0.038, color: '#334155' },
-  { id: 'gold', name: 'Solid Gold Bar', icon: '🧱', massKg: 12.4, dragCoeff: 0.8, areaM2: 0.015, color: '#F59E0B' },
-  { id: 'beachball', name: 'Beach Ball', icon: '🏐', massKg: 0.1, dragCoeff: 0.47, areaM2: 0.09, color: '#38BDF8' },
-  { id: 'anvil', name: 'Blacksmith Anvil', icon: '⚒️', massKg: 50.0, dragCoeff: 0.9, areaM2: 0.08, color: '#64748B' },
-  { id: 'piano', name: 'Grand Piano', icon: '🎹', massKg: 300.0, dragCoeff: 1.05, areaM2: 1.8, color: '#1E293B' }
+const AVAILABLE_OBJECTS: GravityObject[] = [
+  { id: 'apple', name: 'Apple', icon: '🍎', massKg: 0.18, dragCoeff: 0.47, areaM2: 0.005 },
+  { id: 'feather', name: 'Feather', icon: '🪶', massKg: 0.003, dragCoeff: 1.3, areaM2: 0.008 },
+  { id: 'bricks', name: 'Bricks', icon: '🧱', massKg: 10.0, dragCoeff: 0.8, areaM2: 0.02 },
+  { id: 'piano', name: 'Piano', icon: '🎹', massKg: 280.0, dragCoeff: 1.1, areaM2: 1.5 },
+  { id: 'bowling', name: 'Bowling Ball', icon: '🎳', massKg: 7.2, dragCoeff: 0.47, areaM2: 0.038 },
+  { id: 'beachball', name: 'Beach Ball', icon: '🏐', massKg: 0.1, dragCoeff: 0.47, areaM2: 0.08 },
+  { id: 'anvil', name: 'Anvil', icon: '⚒️', massKg: 50.0, dragCoeff: 0.9, areaM2: 0.07 }
 ];
 
-interface PlanetGravity {
+interface PlanetInfo {
   id: string;
   name: string;
   g: number;
   icon: string;
-  atmosphereDensity: number; // kg/m3 (Earth is ~1.225)
+  pastelBg: string;
+  airDensity: number;
 }
 
-const PLANETS: PlanetGravity[] = [
-  { id: 'space', name: 'Zero-G Space', g: 0.0, icon: '🛰️', atmosphereDensity: 0.0 },
-  { id: 'moon', name: 'The Moon', g: 1.62, icon: '🌙', atmosphereDensity: 0.0 },
-  { id: 'mars', name: 'Mars', g: 3.72, icon: '🪐', atmosphereDensity: 0.02 },
-  { id: 'earth', name: 'Earth', g: 9.81, icon: '🌍', atmosphereDensity: 1.225 },
-  { id: 'jupiter', name: 'Jupiter', g: 24.79, icon: '⚡', atmosphereDensity: 2.0 },
-  { id: 'sun', name: 'The Sun (Surface)', g: 274.0, icon: '☀️', atmosphereDensity: 0.5 }
+const PLANETS: PlanetInfo[] = [
+  { id: 'earth', name: 'Earth', g: 9.81, icon: '🌍', pastelBg: '#F0FDF4', airDensity: 1.2 },
+  { id: 'moon', name: 'The Moon', g: 1.62, icon: '🌙', pastelBg: '#F8FAFC', airDensity: 0.0 },
+  { id: 'mars', name: 'Mars', g: 3.72, icon: '🪐', pastelBg: '#FFF1F2', airDensity: 0.02 },
+  { id: 'jupiter', name: 'Jupiter', g: 24.79, icon: '⚡', pastelBg: '#FEF3C7', airDensity: 1.8 },
+  { id: 'sun', name: 'The Sun', g: 274.0, icon: '☀️', pastelBg: '#FEF9C3', airDensity: 0.5 },
+  { id: 'space', name: 'Zero-G Space', g: 0.0, icon: '🛰️', pastelBg: '#F3E8FF', airDensity: 0.0 }
 ];
 
 interface DefyingGravityGameProps {
@@ -45,103 +46,95 @@ interface DefyingGravityGameProps {
 export const DefyingGravityGame: React.FC<DefyingGravityGameProps> = ({ onOpenQuiz }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Experiment parameters
+  // Planet selection
   const [selectedPlanetId, setSelectedPlanetId] = useState<string>('earth');
-  const [customG, setCustomG] = useState<number>(9.81);
-  const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
-  const [fallHeightMeters, setFallHeightMeters] = useState<number>(50); // 10m to 200m
-  const [hasAirResistance, setHasAirResistance] = useState<boolean>(true);
+  const [dropHeightMeters, setDropHeightMeters] = useState<number>(50); // 20m, 50m, 100m
 
-  // Lane selection
-  const [lane1ObjectId, setLane1ObjectId] = useState<string>('bowling');
-  const [lane2ObjectId, setLane2ObjectId] = useState<string>('feather');
+  // Active objects (up to 4 objects)
+  const [selectedObjectIds, setSelectedObjectIds] = useState<string[]>(['apple', 'feather', 'bowling', 'bricks']);
 
-  // Simulation running state
+  // Simulation run state
   const [isDropping, setIsDropping] = useState<boolean>(false);
-  const [lane1Time, setLane1Time] = useState<number | null>(null);
-  const [lane2Time, setLane2Time] = useState<number | null>(null);
-  const [lane1Velocity, setLane1Velocity] = useState<number>(0);
-  const [lane2Velocity, setLane2Velocity] = useState<number>(0);
+  const [results, setResults] = useState<Record<string, { time: number; distance: number; speedKmh: number }>>({});
 
-  const activePlanet = PLANETS.find(p => p.id === selectedPlanetId) || PLANETS[3];
-  const gValue = isCustomMode ? customG : activePlanet.g;
-  const airDensity = hasAirResistance ? (isCustomMode ? 1.225 : activePlanet.atmosphereDensity) : 0.0;
+  const activePlanet = PLANETS.find(p => p.id === selectedPlanetId) || PLANETS[0];
+  const activeObjects = AVAILABLE_OBJECTS.filter(o => selectedObjectIds.includes(o.id));
 
-  const obj1 = OBJECTS.find(o => o.id === lane1ObjectId) || OBJECTS[2];
-  const obj2 = OBJECTS.find(o => o.id === lane2ObjectId) || OBJECTS[1];
+  // Physics state for each active object
+  const physicsRef = useRef<{
+    [id: string]: {
+      yMeters: number; // 0 to dropHeightMeters
+      v: number;
+      finished: boolean;
+      finishTime: number;
+    };
+  }>({});
 
-  // Simulation physics positions (in meters)
-  const simStateRef = useRef<{
-    t: number;
-    y1: number;
-    v1: number;
-    hit1: boolean;
-    y2: number;
-    v2: number;
-    hit2: boolean;
-  }>({
-    t: 0,
-    y1: 0,
-    v1: 0,
-    hit1: false,
-    y2: 0,
-    v2: 0,
-    hit2: false
-  });
-
+  const timerRef = useRef<number>(0);
   const animFrameRef = useRef<number>(0);
 
-  const startDrop = () => {
+  // Toggle object in drop experiment (up to 4)
+  const toggleObject = (id: string) => {
+    if (selectedObjectIds.includes(id)) {
+      if (selectedObjectIds.length > 1) {
+        setSelectedObjectIds(selectedObjectIds.filter(item => item !== id));
+      }
+    } else {
+      if (selectedObjectIds.length < 4) {
+        setSelectedObjectIds([...selectedObjectIds, id]);
+      }
+    }
+    handleReset();
+  };
+
+  const handleStartDrop = () => {
     setIsDropping(true);
-    setLane1Time(null);
-    setLane2Time(null);
-    setLane1Velocity(0);
-    setLane2Velocity(0);
+    setResults({});
+    timerRef.current = 0;
 
-    simStateRef.current = {
-      t: 0,
-      y1: 0,
-      v1: 0,
-      hit1: false,
-      y2: 0,
-      v2: 0,
-      hit2: false
-    };
+    const initPhysics: typeof physicsRef.current = {};
+    activeObjects.forEach(obj => {
+      initPhysics[obj.id] = {
+        yMeters: 0,
+        v: 0,
+        finished: false,
+        finishTime: 0
+      };
+    });
+    physicsRef.current = initPhysics;
   };
 
-  const resetDrop = () => {
+  const handleReset = () => {
     setIsDropping(false);
-    setLane1Time(null);
-    setLane2Time(null);
-    setLane1Velocity(0);
-    setLane2Velocity(0);
-
-    simStateRef.current = {
-      t: 0,
-      y1: 0,
-      v1: 0,
-      hit1: false,
-      y2: 0,
-      v2: 0,
-      hit2: false
-    };
+    setResults({});
+    timerRef.current = 0;
+    const initPhysics: typeof physicsRef.current = {};
+    activeObjects.forEach(obj => {
+      initPhysics[obj.id] = {
+        yMeters: 0,
+        v: 0,
+        finished: false,
+        finishTime: 0
+      };
+    });
+    physicsRef.current = initPhysics;
   };
 
-  // Main Canvas Render and Physics Loop
+  // Main Canvas Render and Drop Kinematics Loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let isRunning = true;
-    let lastTimestamp = performance.now();
+    let isLive = true;
+    let lastTime = performance.now();
 
     const render = (now: number) => {
-      if (!isRunning) return;
+      if (!isLive) return;
 
-      const dt = Math.min((now - lastTimestamp) / 1000, 0.05); // seconds
-      lastTimestamp = now;
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
 
       const dpr = window.devicePixelRatio || 1;
       const width = canvas.clientWidth;
@@ -156,405 +149,283 @@ export const DefyingGravityGame: React.FC<DefyingGravityGameProps> = ({ onOpenQu
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      // Background Chamber
-      const chamberGrad = ctx.createLinearGradient(0, 0, 0, height);
-      chamberGrad.addColorStop(0, '#0F172A');
-      chamberGrad.addColorStop(1, '#1E293B');
-      ctx.fillStyle = chamberGrad;
+      // CHANGE BACKGROUND COLOR WHEN PLANET CHANGES (Pastel aesthetic maintained)
+      ctx.fillStyle = activePlanet.pastelBg;
       ctx.fillRect(0, 0, width, height);
 
-      // Measurement Ruler Grid lines along center
-      const chamberTop = 50;
-      const chamberBottom = height - 50;
-      const chamberHeightPx = chamberBottom - chamberTop;
+      // Frame parameters
+      const scaleLeftX = 65;
+      const stageTopY = 40;
+      const groundY = height - 45;
+      const stageHeightPx = groundY - stageTopY;
 
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-      ctx.font = '10px monospace';
-
-      const tickCount = 10;
-      for (let i = 0; i <= tickCount; i++) {
-        const py = chamberTop + (i / tickCount) * chamberHeightPx;
-        const m = ((i / tickCount) * fallHeightMeters).toFixed(0);
-        ctx.beginPath();
-        ctx.moveTo(width / 2 - 20, py);
-        ctx.lineTo(width / 2 + 20, py);
-        ctx.stroke();
-        ctx.fillText(`${m}m`, width / 2 + 24, py + 3);
-      }
-
-      // Dividing Lane line
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
-      ctx.setLineDash([4, 4]);
+      // 1. MEASURING SCALE ON THE LEFT SIDE OF SCREEN
+      // STARTS AT 0 AT THE BOTTOM, WITH HIGHEST NUMBER AT THE TOP!
+      ctx.strokeStyle = '#94A3B8';
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.moveTo(width / 2, chamberTop);
-      ctx.lineTo(width / 2, chamberBottom);
+      ctx.moveTo(scaleLeftX, stageTopY);
+      ctx.lineTo(scaleLeftX, groundY);
       ctx.stroke();
-      ctx.setLineDash([]);
 
-      // Top Release Gantry Beam
+      // Tick marks from 0 at bottom to dropHeightMeters at top
       ctx.fillStyle = '#475569';
-      ctx.fillRect(40, chamberTop - 12, width - 80, 12);
-      ctx.fillStyle = '#10B981';
-      ctx.fillRect(width * 0.25 - 20, chamberTop - 8, 40, 8);
-      ctx.fillRect(width * 0.75 - 20, chamberTop - 8, 40, 8);
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'right';
 
-      // Bottom Impact Platform
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(40, chamberBottom, width - 80, 16);
-      ctx.fillStyle = '#F59E0B';
-      ctx.fillRect(width * 0.25 - 35, chamberBottom, 70, 6);
-      ctx.fillRect(width * 0.75 - 35, chamberBottom, 70, 6);
+      const tickSteps = 5;
+      for (let i = 0; i <= tickSteps; i++) {
+        // py: i=0 is bottom (0m), i=tickSteps is top (dropHeightMeters)
+        const py = groundY - (i / tickSteps) * stageHeightPx;
+        const meterVal = Math.round((i / tickSteps) * dropHeightMeters);
 
-      // Physics Integration if Dropping
-      if (isDropping && gValue > 0) {
-        simStateRef.current.t += dt;
-
-        // Lane 1 Integration
-        if (!simStateRef.current.hit1) {
-          // Downward gravity force: Fg = m * g
-          // Upward drag force: Fd = 0.5 * rho * v^2 * Cd * A
-          const v = simStateRef.current.v1;
-          const dragForce = 0.5 * airDensity * (v * v) * obj1.dragCoeff * obj1.areaM2;
-          const netForce = (obj1.massKg * gValue) - dragForce;
-          const a = netForce / obj1.massKg;
-
-          simStateRef.current.v1 += a * dt;
-          simStateRef.current.y1 += simStateRef.current.v1 * dt;
-
-          if (simStateRef.current.y1 >= fallHeightMeters) {
-            simStateRef.current.y1 = fallHeightMeters;
-            simStateRef.current.hit1 = true;
-            setLane1Time(simStateRef.current.t);
-            setLane1Velocity(simStateRef.current.v1 * 3.6); // km/h
-          }
-        }
-
-        // Lane 2 Integration
-        if (!simStateRef.current.hit2) {
-          const v = simStateRef.current.v2;
-          const dragForce = 0.5 * airDensity * (v * v) * obj2.dragCoeff * obj2.areaM2;
-          const netForce = (obj2.massKg * gValue) - dragForce;
-          const a = netForce / obj2.massKg;
-
-          simStateRef.current.v2 += a * dt;
-          simStateRef.current.y2 += simStateRef.current.v2 * dt;
-
-          if (simStateRef.current.y2 >= fallHeightMeters) {
-            simStateRef.current.y2 = fallHeightMeters;
-            simStateRef.current.hit2 = true;
-            setLane2Time(simStateRef.current.t);
-            setLane2Velocity(simStateRef.current.v2 * 3.6); // km/h
-          }
-        }
-      }
-
-      // Convert Meters to Screen Y
-      const meterToPx = (m: number) => {
-        return chamberTop + (m / fallHeightMeters) * chamberHeightPx;
-      };
-
-      // Draw Object 1 in Lane 1
-      const lane1X = width * 0.25;
-      const lane1Y = meterToPx(simStateRef.current.y1);
-
-      ctx.save();
-      ctx.translate(lane1X, lane1Y);
-      // Soft glow
-      ctx.shadowColor = '#38BDF8';
-      ctx.shadowBlur = 12;
-      ctx.font = '32px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(obj1.icon, 0, 0);
-
-      // Trailing velocity streak
-      if (simStateRef.current.v1 > 1 && !simStateRef.current.hit1) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
-        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(0, -15);
-        ctx.lineTo(0, -15 - Math.min(simStateRef.current.v1 * 2, 45));
+        ctx.moveTo(scaleLeftX - 8, py);
+        ctx.lineTo(scaleLeftX + 4, py);
         ctx.stroke();
+
+        ctx.fillText(`${meterVal}m`, scaleLeftX - 12, py + 3.5);
       }
-      ctx.restore();
 
-      // Draw Object 2 in Lane 2
-      const lane2X = width * 0.75;
-      const lane2Y = meterToPx(simStateRef.current.y2);
-
-      ctx.save();
-      ctx.translate(lane2X, lane2Y);
-      ctx.shadowColor = '#F472B6';
-      ctx.shadowBlur = 12;
-      ctx.font = '32px sans-serif';
+      // Ground Base Line
+      ctx.fillStyle = '#CBD5E1';
+      ctx.fillRect(scaleLeftX, groundY, width - scaleLeftX - 20, 10);
+      ctx.fillStyle = '#64748B';
+      ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(obj2.icon, 0, 0);
+      ctx.fillText('GROUND (0 meters)', (scaleLeftX + width - 20) / 2, groundY + 24);
 
-      if (simStateRef.current.v2 > 1 && !simStateRef.current.hit2) {
-        ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(0, -15);
-        ctx.lineTo(0, -15 - Math.min(simStateRef.current.v2 * 2, 45));
-        ctx.stroke();
+      // Drop Release Beam at top
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillRect(scaleLeftX, stageTopY - 8, width - scaleLeftX - 20, 8);
+
+      // 2. KINEMATIC INTEGRATION
+      if (isDropping && activePlanet.g > 0) {
+        timerRef.current += dt;
+
+        activeObjects.forEach(obj => {
+          const state = physicsRef.current[obj.id];
+          if (!state || state.finished) return;
+
+          // Drag force Fd = 0.5 * rho * v^2 * Cd * A
+          const v = state.v;
+          const drag = 0.5 * activePlanet.airDensity * (v * v) * obj.dragCoeff * obj.areaM2;
+          const netForce = (obj.massKg * activePlanet.g) - drag;
+          const a = netForce / obj.massKg;
+
+          state.v += a * dt;
+          state.yMeters += state.v * dt;
+
+          if (state.yMeters >= dropHeightMeters) {
+            state.yMeters = dropHeightMeters;
+            state.finished = true;
+            state.finishTime = timerRef.current;
+
+            setResults(prev => ({
+              ...prev,
+              [obj.id]: {
+                time: timerRef.current,
+                distance: dropHeightMeters,
+                speedKmh: Math.round(state.v * 3.6)
+              }
+            }));
+          }
+        });
       }
-      ctx.restore();
+
+      // 3. DRAW OBJECTS (Up to 4 objects spaced horizontally)
+      const objAreaWidth = (width - scaleLeftX - 40);
+      const colStep = objAreaWidth / (activeObjects.length + 1);
+
+      activeObjects.forEach((obj, idx) => {
+        const objX = scaleLeftX + 30 + (idx + 1) * colStep - (colStep / 2);
+        const state = physicsRef.current[obj.id] || { yMeters: 0, v: 0 };
+
+        // Position on screen: Top starts at stageTopY (yMeters = 0), falls down to groundY (yMeters = dropHeightMeters)
+        const fallRatio = Math.min(state.yMeters / dropHeightMeters, 1);
+        const objScreenY = stageTopY + fallRatio * stageHeightPx - 16;
+
+        ctx.save();
+        ctx.translate(objX, objScreenY);
+
+        // Icon
+        ctx.font = '28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(obj.icon, 0, 0);
+
+        // Name tag
+        ctx.fillStyle = '#334155';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(obj.name, 0, 24);
+
+        ctx.restore();
+      });
 
       animFrameRef.current = requestAnimationFrame(render);
     };
 
     animFrameRef.current = requestAnimationFrame(render);
-
     return () => {
-      isRunning = false;
+      isLive = false;
       cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isDropping, gValue, airDensity, fallHeightMeters, obj1, obj2]);
+  }, [isDropping, activePlanet, dropHeightMeters, activeObjects]);
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50/80 p-4 sm:p-5 rounded-3xl border border-emerald-200/80">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
-            <Compass className="w-6 h-6 animate-pulse" />
+      
+      {/* Top Banner (Clean, no duplicate quiz button) */}
+      <div className="bg-[#F3E8FF] p-5 rounded-3xl border border-purple-200">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-xs">
+            <Compass className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Defying Gravity Experiment
+            <h2 className="text-xl sm:text-2xl font-black text-purple-950 tracking-tight">
+              Defying Gravity
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-              Recreate Galileo's Tower of Pisa & Apollo 15 Moon drops! Compare free-fall kinematics across planets and vacuum.
+            <p className="text-xs sm:text-sm text-purple-800">
+              Drop objects on different planets! Compare falling times and speeds with a clear vertical height scale.
             </p>
           </div>
         </div>
-
-        <button
-          onClick={onOpenQuiz}
-          className="self-start sm:self-center px-4 py-2.5 rounded-2xl text-sm font-bold bg-white text-emerald-700 hover:bg-emerald-100 border border-emerald-200 shadow-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
-        >
-          <HelpCircle className="w-4 h-4 text-emerald-600" />
-          <span>Gravity Quiz</span>
-        </button>
       </div>
 
       {/* Main Sandbox Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Stage (Dual Lane Drop Chamber Canvas) */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col items-center">
+        {/* Left Stage Canvas */}
+        <div className="lg:col-span-8 bg-white rounded-3xl p-5 sm:p-6 border border-purple-200 shadow-xs flex flex-col items-center">
           
-          {/* Comparison Scoreboard Header */}
-          <div className="w-full grid grid-cols-2 gap-3 mb-3">
-            {/* Lane 1 Card */}
-            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{obj1.icon}</span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-tight">{obj1.name}</h4>
-                  <p className="text-[10px] text-slate-500">{obj1.massKg} kg</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs font-mono font-extrabold text-blue-600">
-                  {lane1Time !== null ? `${lane1Time.toFixed(3)} s` : isDropping ? 'Falling...' : 'Ready'}
-                </div>
-                <div className="text-[10px] text-slate-400">
-                  {lane1Velocity > 0 ? `${lane1Velocity.toFixed(1)} km/h` : '0 km/h'}
-                </div>
-              </div>
-            </div>
-
-            {/* Lane 2 Card */}
-            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{obj2.icon}</span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-tight">{obj2.name}</h4>
-                  <p className="text-[10px] text-slate-500">{obj2.massKg} kg</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs font-mono font-extrabold text-pink-600">
-                  {lane2Time !== null ? `${lane2Time.toFixed(3)} s` : isDropping ? 'Falling...' : 'Ready'}
-                </div>
-                <div className="text-[10px] text-slate-400">
-                  {lane2Velocity > 0 ? `${lane2Velocity.toFixed(1)} km/h` : '0 km/h'}
-                </div>
-              </div>
-            </div>
+          <div className="w-full flex items-center justify-between mb-3 text-xs font-semibold text-slate-700">
+            <span className="font-bold text-purple-900 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
+              {activePlanet.icon} {activePlanet.name} · Gravity: {activePlanet.g} m/s²
+            </span>
+            <span>Height: {dropHeightMeters}m</span>
           </div>
 
-          {/* Canvas Viewport */}
-          <div className="relative w-full h-[400px] sm:h-[460px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner select-none">
+          {/* Canvas Viewport with scale on left (0m at bottom, top at max) */}
+          <div className="relative w-full h-[360px] sm:h-[420px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner select-none">
             <canvas ref={canvasRef} className="w-full h-full block" />
-            
-            {/* Environment Badge */}
-            <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-white shadow-sm flex items-center gap-1.5">
-              <span>{isCustomMode ? '🧪 Custom' : `${activePlanet.icon} ${activePlanet.name}`}</span>
-              <span className="text-slate-400">·</span>
-              <span className="text-emerald-400">{gValue.toFixed(2)} m/s²</span>
-              <span className="text-slate-400">·</span>
-              <span className={hasAirResistance ? 'text-amber-300' : 'text-cyan-300'}>
-                {hasAirResistance ? 'Atmosphere Air' : 'Pure Vacuum'}
-              </span>
-            </div>
           </div>
 
-          {/* Controls Ribbon */}
-          <div className="w-full mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={startDrop}
-                disabled={isDropping && lane1Time === null && lane2Time === null}
-                className="px-6 py-2.5 rounded-xl font-black text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md flex items-center gap-2 active:scale-95 transition-all cursor-pointer text-sm"
-              >
-                <Play className="w-4 h-4 fill-white" />
-                <span>Drop Both Objects!</span>
-              </button>
-
-              <button
-                onClick={resetDrop}
-                className="px-4 py-2.5 rounded-xl font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer text-sm"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Reset Height</span>
-              </button>
-            </div>
-
-            {/* Vacuum Toggle */}
+          {/* Single Drop / Reset Button */}
+          <div className="w-full mt-4 flex items-center justify-between gap-3">
             <button
-              onClick={() => { setHasAirResistance(!hasAirResistance); resetDrop(); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold border flex items-center gap-2 transition-all cursor-pointer ${
-                !hasAirResistance
-                  ? 'bg-cyan-100 border-cyan-400 text-cyan-900 shadow-sm'
-                  : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
-              }`}
+              onClick={handleStartDrop}
+              className="px-6 py-2.5 rounded-xl font-bold text-white bg-purple-600 hover:bg-purple-700 active:scale-98 transition-all flex items-center gap-2 cursor-pointer shadow-xs text-xs sm:text-sm"
             >
-              <Wind className="w-3.5 h-3.5" />
-              <span>{hasAirResistance ? 'Air Drag: ON' : 'Vacuum Chamber: ON'}</span>
+              <Play className="w-4 h-4 fill-white" />
+              <span>Drop Objects!</span>
             </button>
+
+            <button
+              onClick={handleReset}
+              className="px-4 py-2.5 rounded-xl font-bold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-2 cursor-pointer text-xs sm:text-sm"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Reset Height</span>
+            </button>
+          </div>
+
+          {/* Fall Results Display Cards (Time, Distance, Speed) */}
+          <div className="w-full mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {activeObjects.map(obj => {
+              const res = results[obj.id];
+              return (
+                <div key={obj.id} className="p-3 rounded-2xl border border-purple-100 bg-[#FAF5FF] space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg">{obj.icon}</span>
+                    <span className="font-extrabold text-xs text-slate-900">{obj.name}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-600 space-y-0.5 pt-1">
+                    <div>Time: <strong className="text-purple-700">{res ? `${res.time.toFixed(2)}s` : '—'}</strong></div>
+                    <div>Distance: <strong className="text-sky-700">{res ? `${res.distance}m` : `${dropHeightMeters}m`}</strong></div>
+                    <div>Speed: <strong className="text-pink-700">{res ? `${res.speedKmh} km/h` : '—'}</strong></div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right Parameter Deck */}
+        {/* Right Configuration Deck */}
         <div className="lg:col-span-4 space-y-5">
           
-          {/* Gravitational Body Presets */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-            <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-              <Scale className="w-4 h-4 text-emerald-500" />
-              <span>Planetary Gravity Field</span>
+          {/* Planet Selection */}
+          <div className="bg-white rounded-3xl p-5 border border-purple-200 shadow-xs space-y-3">
+            <h3 className="font-extrabold text-slate-900 text-sm">
+              Select Planet
             </h3>
-
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-2">
               {PLANETS.map(p => (
                 <button
                   key={p.id}
-                  onClick={() => { setSelectedPlanetId(p.id); setIsCustomMode(false); resetDrop(); }}
-                  className={`p-2 rounded-xl text-center border transition-all cursor-pointer ${
-                    !isCustomMode && selectedPlanetId === p.id
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold'
-                      : 'border-slate-200 hover:border-slate-300'
+                  onClick={() => { setSelectedPlanetId(p.id); handleReset(); }}
+                  className={`p-2.5 rounded-xl text-center border text-xs font-bold transition-all cursor-pointer ${
+                    selectedPlanetId === p.id
+                      ? 'border-purple-600 bg-[#F3E8FF] text-purple-950 font-bold'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-purple-300'
                   }`}
                 >
                   <div className="text-base">{p.icon}</div>
-                  <div className="text-[11px] mt-0.5 truncate">{p.name}</div>
+                  <div className="text-[11px] mt-0.5">{p.name}</div>
                   <div className="text-[10px] text-slate-500 font-mono">{p.g} m/s²</div>
                 </button>
               ))}
             </div>
+          </div>
 
-            {/* Custom Gravity Input */}
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                <span>Custom Gravity Acceleration (g)</span>
-                <span className="font-mono text-emerald-700">{customG.toFixed(2)} m/s²</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="50"
-                step="0.1"
-                value={customG}
-                onChange={e => {
-                  setCustomG(Number(e.target.value));
-                  setIsCustomMode(true);
-                  resetDrop();
-                }}
-                className="w-full accent-emerald-500 cursor-pointer"
-              />
+          {/* Choose Objects (Up to 4 Objects) */}
+          <div className="bg-white rounded-3xl p-5 border border-purple-200 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-slate-900 text-sm">
+                Choose Objects (Up to 4)
+              </h3>
+              <span className="text-xs text-purple-700 font-bold">
+                {selectedObjectIds.length}/4 Selected
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {AVAILABLE_OBJECTS.map(obj => {
+                const isSelected = selectedObjectIds.includes(obj.id);
+                return (
+                  <button
+                    key={obj.id}
+                    onClick={() => toggleObject(obj.id)}
+                    className={`p-2 rounded-xl text-left border text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                      isSelected
+                        ? 'border-purple-500 bg-[#F3E8FF] text-purple-900'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-purple-200'
+                    }`}
+                  >
+                    <span className="text-lg">{obj.icon}</span>
+                    <span className="truncate">{obj.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Lane Object Selectors */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+          {/* Drop Tower Height */}
+          <div className="bg-white rounded-3xl p-5 border border-purple-200 shadow-xs space-y-2">
             <h3 className="font-extrabold text-slate-900 text-sm">
-              Select Comparison Objects
+              Drop Height
             </h3>
-
-            {/* Lane 1 Object */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-blue-700">Lane 1 Object</label>
-              <div className="grid grid-cols-4 gap-1.5">
-                {OBJECTS.map(obj => (
-                  <button
-                    key={obj.id}
-                    onClick={() => { setLane1ObjectId(obj.id); resetDrop(); }}
-                    className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer ${
-                      lane1ObjectId === obj.id
-                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-400'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="text-xl">{obj.icon}</div>
-                    <div className="text-[10px] text-slate-700 truncate">{obj.name.split(' ')[0]}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Lane 2 Object */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-pink-700">Lane 2 Object</label>
-              <div className="grid grid-cols-4 gap-1.5">
-                {OBJECTS.map(obj => (
-                  <button
-                    key={obj.id}
-                    onClick={() => { setLane2ObjectId(obj.id); resetDrop(); }}
-                    className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer ${
-                      lane2ObjectId === obj.id
-                        ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-400'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="text-xl">{obj.icon}</div>
-                    <div className="text-[10px] text-slate-700 truncate">{obj.name.split(' ')[0]}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Drop Chamber Height */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-2">
-            <div className="flex justify-between text-xs font-bold text-slate-700">
-              <span>Drop Tower Height</span>
-              <span className="font-mono text-emerald-700">{fallHeightMeters} meters</span>
-            </div>
-            <div className="flex gap-2">
-              {[10, 25, 50, 100, 200].map(h => (
+            <div className="grid grid-cols-3 gap-2">
+              {[20, 50, 100].map(h => (
                 <button
                   key={h}
-                  onClick={() => { setFallHeightMeters(h); resetDrop(); }}
-                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    fallHeightMeters === h ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-600'
+                  onClick={() => { setDropHeightMeters(h); handleReset(); }}
+                  className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    dropHeightMeters === h
+                      ? 'bg-purple-600 text-white border-purple-600'
+                      : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}
                 >
-                  {h}m
+                  {h} meters
                 </button>
               ))}
             </div>
@@ -563,6 +434,10 @@ export const DefyingGravityGame: React.FC<DefyingGravityGameProps> = ({ onOpenQu
         </div>
 
       </div>
+
+      {/* Fun Facts Area with Quiz Answers */}
+      <FunFactsSection gameId="defying-gravity" onOpenQuiz={onOpenQuiz} />
+
     </div>
   );
 };

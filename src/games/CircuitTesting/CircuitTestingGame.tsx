@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, HelpCircle, RotateCcw, Power, Lightbulb, Fan, BatteryCharging, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Zap, Power } from 'lucide-react';
+import { FunFactsSection } from '../../components/FunFactsSection';
 
-type CircuitMode = 'series' | 'parallel' | 'fan-bulb' | 'generator-loop';
+type CircuitMode = 'series' | 'parallel';
 type PowerSourceType = 'battery' | 'generator';
 
 interface CircuitTestingGameProps {
@@ -11,101 +12,49 @@ interface CircuitTestingGameProps {
 export const CircuitTestingGame: React.FC<CircuitTestingGameProps> = ({ onOpenQuiz }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Circuit configuration state
+  // Circuit configuration
   const [circuitMode, setCircuitMode] = useState<CircuitMode>('series');
   const [powerSource, setPowerSource] = useState<PowerSourceType>('battery');
-  const [batteryVoltage, setBatteryVoltage] = useState<number>(6); // 1.5V, 3V, 6V, 9V, 12V
-  const [generatorRpm, setGeneratorRpm] = useState<number>(0);
-  const [isGeneratorCranking, setIsGeneratorCranking] = useState<boolean>(false);
   const [mainSwitchClosed, setMainSwitchClosed] = useState<boolean>(true);
-  const [branchSwitchClosed, setBranchSwitchClosed] = useState<boolean>(true);
 
-  // Components in circuit
-  const [bulb1Resistance, setBulb1Resistance] = useState<number>(10); // ohms
-  const [bulb2Resistance, setBulb2Resistance] = useState<number>(10); // ohms
-  const [fanResistance, setFanResistance] = useState<number>(15); // ohms
+  // Component status controls: Working / Broken
+  const [comp1Broken, setComp1Broken] = useState<boolean>(false);
+  const [comp2Broken, setComp2Broken] = useState<boolean>(false);
 
-  // Animated pulse phase
+  // Voltage Cursor/Slider (1.5V to 12.0V)
+  const [generatorVoltage, setGeneratorVoltage] = useState<number>(6.0);
+  const [batteryVoltage, setBatteryVoltage] = useState<number>(6.0);
+
+  // Component options: Lamp or Fan on branch 2
+  const [useFanOnBranch2, setUseFanOnBranch2] = useState<boolean>(false);
+
   const electronPhaseRef = useRef<number>(0);
   const fanRotationRef = useRef<number>(0);
   const animFrameRef = useRef<number>(0);
 
-  // Compute Active Voltage
-  const activeVoltage = powerSource === 'battery' ? batteryVoltage : (generatorRpm / 100) * 12;
+  // Active operating voltage
+  const currentVoltage = powerSource === 'battery' ? batteryVoltage : generatorVoltage;
+  const isMasterLive = mainSwitchClosed && currentVoltage > 0.5;
 
-  // Circuit analysis calculations (Ohm's Law)
-  const isCircuitActive = (mainSwitchClosed && activeVoltage > 0);
+  // Series conduction: If any component is broken, the entire series loop stops
+  const isSeriesIntact = !comp1Broken && !comp2Broken;
+  const isSeriesConducting = circuitMode === 'series' && isMasterLive && isSeriesIntact;
 
-  let currentTotal = 0;
-  let bulb1Current = 0;
-  let bulb2Current = 0;
-  let fanCurrent = 0;
-  let equivalentResistance = 0;
-  let isShortCircuit = false;
+  // Parallel conduction: Both branches permanently connected; each branch operates independently
+  const b1Conducting = circuitMode === 'parallel' && isMasterLive && !comp1Broken;
+  const b2Conducting = circuitMode === 'parallel' && isMasterLive && !comp2Broken;
 
-  if (isCircuitActive) {
-    if (circuitMode === 'series') {
-      equivalentResistance = bulb1Resistance + bulb2Resistance;
-      currentTotal = activeVoltage / equivalentResistance;
-      bulb1Current = currentTotal;
-      bulb2Current = currentTotal;
-    } else if (circuitMode === 'parallel') {
-      const r1 = bulb1Resistance;
-      const r2 = branchSwitchClosed ? bulb2Resistance : Infinity;
-      equivalentResistance = (r1 * r2) / (r1 + r2);
-      if (!branchSwitchClosed) equivalentResistance = r1;
-      currentTotal = activeVoltage / equivalentResistance;
-      bulb1Current = activeVoltage / r1;
-      bulb2Current = branchSwitchClosed ? activeVoltage / r2 : 0;
-    } else if (circuitMode === 'fan-bulb') {
-      equivalentResistance = bulb1Resistance + fanResistance;
-      currentTotal = activeVoltage / equivalentResistance;
-      bulb1Current = currentTotal;
-      fanCurrent = currentTotal;
-    } else {
-      // generator loop
-      equivalentResistance = bulb1Resistance + fanResistance;
-      currentTotal = activeVoltage / equivalentResistance;
-      bulb1Current = currentTotal;
-      fanCurrent = currentTotal;
-    }
-
-    if (equivalentResistance <= 0.5) {
-      isShortCircuit = true;
-    }
-  }
-
-  // Handle hand-crank generator spin
-  const crankGenerator = () => {
-    setGeneratorRpm(prev => Math.min(prev + 25, 120));
-    setIsGeneratorCranking(true);
-  };
-
-  useEffect(() => {
-    if (powerSource !== 'generator') return;
-    const interval = setInterval(() => {
-      setGeneratorRpm(prev => {
-        if (prev <= 1) {
-          setIsGeneratorCranking(false);
-          return 0;
-        }
-        return Math.max(0, prev - 4); // spin down friction
-      });
-    }, 100);
-    return () => clearInterval(interval);
-  }, [powerSource]);
-
-  // Main 2D Canvas rendering loop with 3D toy styling
+  // Render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let isRunning = true;
+    let isLive = true;
 
     const render = () => {
-      if (!isRunning) return;
+      if (!isLive) return;
 
       const dpr = window.devicePixelRatio || 1;
       const width = canvas.clientWidth;
@@ -120,712 +69,619 @@ export const CircuitTestingGame: React.FC<CircuitTestingGameProps> = ({ onOpenQu
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      // Advance electron phase and fan angle
-      if (isCircuitActive && currentTotal > 0.01) {
-        electronPhaseRef.current = (electronPhaseRef.current + currentTotal * 5) % 1000;
-        fanRotationRef.current = (fanRotationRef.current + (fanCurrent > 0 ? fanCurrent * 18 : 0)) % (Math.PI * 2);
+      // Voltage scaling for brightness and speed
+      const voltageScale = Math.max(0.2, currentVoltage / 6.0);
+      const isAnyActive = isSeriesConducting || b1Conducting || b2Conducting;
+
+      if (isAnyActive) {
+        electronPhaseRef.current = (electronPhaseRef.current + 2.5 * voltageScale) % 1000;
+        fanRotationRef.current = (fanRotationRef.current + 0.12 * voltageScale) % (Math.PI * 2);
       }
 
-      // Draw Wooden / Pastel Toy Breadboard Base
-      const pad = 24;
-      const bWidth = width - pad * 2;
-      const bHeight = height - pad * 2;
+      // Wooden Pastel Pegboard Base
+      const pad = 20;
+      const bw = width - pad * 2;
+      const bh = height - pad * 2;
 
-      // Board drop shadow
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.08)';
+      ctx.fillStyle = '#FEFCE8';
       ctx.beginPath();
-      ctx.roundRect(pad + 4, pad + 6, bWidth, bHeight, 28);
+      ctx.roundRect(pad, pad, bw, bh, 24);
       ctx.fill();
-
-      // Board Surface (Cute Soft Creamy Wood)
-      const woodGrad = ctx.createLinearGradient(pad, pad, pad, pad + bHeight);
-      woodGrad.addColorStop(0, '#FFFDF8');
-      woodGrad.addColorStop(1, '#F6EEDB');
-      ctx.fillStyle = woodGrad;
-      ctx.beginPath();
-      ctx.roundRect(pad, pad, bWidth, bHeight, 28);
-      ctx.fill();
-
-      // Board rim bevel
-      ctx.strokeStyle = '#E2D5BA';
+      ctx.strokeStyle = '#FEF08A';
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Grid peg holes (Montessori pegboard style)
-      ctx.fillStyle = 'rgba(180, 160, 130, 0.35)';
-      for (let gx = pad + 40; gx < pad + bWidth - 20; gx += 32) {
-        for (let gy = pad + 40; gy < pad + bHeight - 20; gy += 32) {
+      // Pegboard grid dots
+      ctx.fillStyle = 'rgba(234, 179, 8, 0.18)';
+      for (let x = pad + 35; x < pad + bw - 15; x += 35) {
+        for (let y = pad + 35; y < pad + bh - 15; y += 35) {
           ctx.beginPath();
-          ctx.arc(gx, gy, 2, 0, Math.PI * 2);
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
           ctx.fill();
         }
       }
 
-      // Coordinates for standard circuit loop nodes
-      const leftX = pad + 90;
-      const rightX = pad + bWidth - 90;
-      const topY = pad + 75;
-      const bottomY = pad + bHeight - 75;
-      const midY = (topY + bottomY) / 2;
+      // Rails and coordinates
+      const leftRailX = pad + 95;
+      const rightRailX = pad + bw - 75;
+      const topRailY = pad + 70;
+      const bottomRailY = pad + bh - 70;
 
-      // Helper to draw realistic 3D toy wire with moving electrons
-      const drawToyWire = (path: [number, number][], isLive: boolean, flowSpeed: number) => {
-        // Wire Shadow
-        ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-        ctx.lineWidth = 10;
+      // Parallel branch vertical lines
+      const branch1X = leftRailX + (rightRailX - leftRailX) * 0.45;
+      const branch2X = leftRailX + (rightRailX - leftRailX) * 0.85;
+
+      // Draw Wire Helper - exactly uniform appearance across all cables!
+      const drawWireSegment = (p1: [number, number], p2: [number, number], isConducting: boolean) => {
+        ctx.strokeStyle = isConducting ? '#38BDF8' : '#CBD5E1';
+        ctx.lineWidth = 7;
         ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
         ctx.beginPath();
-        path.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(px + 2, py + 3) : ctx.lineTo(px + 2, py + 3)));
+        ctx.moveTo(p1[0], p1[1]);
+        ctx.lineTo(p2[0], p2[1]);
         ctx.stroke();
 
-        // Outer Rubber Insulation (Mint Teal or Pastel Coral)
-        ctx.strokeStyle = isLive ? '#38BDF8' : '#94A3B8';
-        ctx.lineWidth = 8;
-        ctx.beginPath();
-        path.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)));
+        ctx.strokeStyle = isConducting ? '#FFFFFF' : '#E2E8F0';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Top Gloss Highlight
-        ctx.strokeStyle = isLive ? '#BAE6FD' : '#CBD5E1';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Flowing Electrons / Sparkle Pulses
-        if (isLive && flowSpeed > 0.05) {
+        // Moving electron sparks
+        if (isConducting) {
           ctx.fillStyle = '#FEF08A';
-          ctx.shadowColor = '#FBBF24';
-          ctx.shadowBlur = 8;
+          const dist = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+          if (dist > 5) {
+            const num = Math.floor(dist / 26);
+            const dx = (p2[0] - p1[0]) / dist;
+            const dy = (p2[1] - p1[1]) / dist;
 
-          // Compute length and place dots
-          for (let pIdx = 0; pIdx < path.length - 1; pIdx++) {
-            const [x1, y1] = path[pIdx];
-            const [x2, y2] = path[pIdx + 1];
-            const segDist = Math.hypot(x2 - x1, y2 - y1);
-            const numDots = Math.floor(segDist / 28);
-            const dx = (x2 - x1) / segDist;
-            const dy = (y2 - y1) / segDist;
-
-            for (let d = 0; d < numDots; d++) {
-              const offset = ((d * 28 + (electronPhaseRef.current % 28)) % segDist);
-              const dotX = x1 + dx * offset;
-              const dotY = y1 + dy * offset;
+            for (let d = 0; d < num; d++) {
+              const offset = (d * 26 + (electronPhaseRef.current % 26)) % dist;
               ctx.beginPath();
-              ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+              ctx.arc(p1[0] + dx * offset, p1[1] + dy * offset, 3, 0, Math.PI * 2);
               ctx.fill();
             }
           }
-          ctx.shadowBlur = 0;
         }
       };
 
-      // Draw Main Loop Wires
-      if (circuitMode === 'series' || circuitMode === 'fan-bulb' || circuitMode === 'generator-loop') {
-        const loopPath: [number, number][] = [
-          [leftX, topY],
-          [rightX, topY],
-          [rightX, bottomY],
-          [leftX, bottomY],
-          [leftX, topY]
-        ];
-        drawToyWire(loopPath, isCircuitActive, currentTotal);
-      } else {
-        // Parallel Circuit with 2 rungs
-        const mainRung: [number, number][] = [
-          [leftX, topY],
-          [rightX, topY],
-          [rightX, bottomY],
-          [leftX, bottomY],
-          [leftX, topY]
-        ];
-        drawToyWire(mainRung, isCircuitActive, bulb1Current);
+      // Draw Bulb Component Helper with dynamic voltage brightness and broken state
+      const drawBulb = (bx: number, by: number, label: string, isBulbLit: boolean, isBroken: boolean = false) => {
+        ctx.save();
+        ctx.translate(bx, by);
 
-        // Center Parallel Bridge
-        const bridgeRung: [number, number][] = [
-          [leftX + 70, midY],
-          [rightX - 70, midY]
-        ];
-        drawToyWire(bridgeRung, isCircuitActive && branchSwitchClosed, bulb2Current);
-      }
-
-      // Draw Component 1: Power Source (Left Side Center)
-      const pSrcX = leftX;
-      const pSrcY = midY;
-
-      ctx.save();
-      // Power Source 3D Box
-      ctx.fillStyle = '#CBD5E1';
-      ctx.beginPath();
-      ctx.roundRect(pSrcX - 32, pSrcY - 45, 64, 90, 16);
-      ctx.fill();
-
-      if (powerSource === 'battery') {
-        // Pastel Yellow / Cyan 3D Toy Battery
-        const batGrad = ctx.createLinearGradient(pSrcX - 30, pSrcY, pSrcX + 30, pSrcY);
-        batGrad.addColorStop(0, '#38BDF8');
-        batGrad.addColorStop(0.3, '#7DD3FC');
-        batGrad.addColorStop(0.8, '#0284C7');
-        ctx.fillStyle = batGrad;
+        // Bulb Socket Base
+        ctx.fillStyle = '#64748B';
         ctx.beginPath();
-        ctx.roundRect(pSrcX - 30, pSrcY - 40, 60, 80, 14);
+        ctx.roundRect(-16, 10, 32, 16, 4);
         ctx.fill();
-
-        // Brass Top Terminal (+)
         ctx.fillStyle = '#F59E0B';
-        ctx.fillRect(pSrcX - 10, pSrcY - 47, 20, 8);
+        ctx.fillRect(-12, 26, 24, 6);
 
-        // Battery Label
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${batteryVoltage}V DC`, pSrcX, pSrcY + 4);
-        ctx.font = 'bold 10px monospace';
-        ctx.fillText('+', pSrcX, pSrcY - 26);
-        ctx.fillText('-', pSrcX, pSrcY + 32);
-      } else {
-        // Hand Crank Dynamo
-        ctx.fillStyle = '#F472B6';
-        ctx.beginPath();
-        ctx.roundRect(pSrcX - 30, pSrcY - 40, 60, 80, 14);
-        ctx.fill();
-
-        // Crank knob
-        ctx.fillStyle = '#FBBF24';
-        ctx.beginPath();
-        ctx.arc(pSrcX, pSrcY, 16, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#334155';
-        ctx.font = 'bold 9px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('DYNAMO', pSrcX, pSrcY - 20);
-        ctx.fillText(`${activeVoltage.toFixed(1)}V`, pSrcX, pSrcY + 28);
-      }
-      ctx.restore();
-
-      // Draw Component 2: Main Knife Switch (Bottom Center)
-      const swX = (leftX + rightX) / 2;
-      const swY = bottomY;
-
-      ctx.save();
-      // Switch ceramic base
-      ctx.fillStyle = '#F1F5F9';
-      ctx.strokeStyle = '#CBD5E1';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(swX - 45, swY - 20, 90, 40, 12);
-      ctx.fill();
-      ctx.stroke();
-
-      // Brass Contact Terminals
-      ctx.fillStyle = '#D97706';
-      ctx.beginPath();
-      ctx.arc(swX - 25, swY, 6, 0, Math.PI * 2);
-      ctx.arc(swX + 25, swY, 6, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Switch Blade Lever
-      ctx.strokeStyle = '#F59E0B';
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(swX - 25, swY);
-      if (mainSwitchClosed) {
-        ctx.lineTo(swX + 25, swY); // Closed
-      } else {
-        ctx.lineTo(swX + 10, swY - 32); // Open
-      }
-      ctx.stroke();
-
-      // Handle Knob
-      ctx.fillStyle = mainSwitchClosed ? '#10B981' : '#EF4444';
-      ctx.beginPath();
-      ctx.arc(mainSwitchClosed ? swX + 25 : swX + 10, mainSwitchClosed ? swY : swY - 32, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      // Draw Component 3: Bulb 1 (Top Center or Top Right)
-      const bulb1X = circuitMode === 'parallel' ? (leftX + rightX) / 2 : rightX;
-      const bulb1Y = circuitMode === 'parallel' ? topY : (topY + midY) / 2;
-
-      ctx.save();
-      // Bulb Socket Base
-      ctx.fillStyle = '#E2E8F0';
-      ctx.beginPath();
-      ctx.roundRect(bulb1X - 24, bulb1Y - 14, 48, 28, 8);
-      ctx.fill();
-
-      // Glow Bloom if lit
-      const isBulb1Lit = isCircuitActive && bulb1Current > 0.05;
-      const brightness = Math.min(bulb1Current * 1.5, 1.4);
-
-      if (isBulb1Lit) {
-        const glowGrad = ctx.createRadialGradient(bulb1X, bulb1Y - 25, 5, bulb1X, bulb1Y - 25, 55 * brightness);
-        glowGrad.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
-        glowGrad.addColorStop(0.5, 'rgba(250, 204, 21, 0.5)');
-        glowGrad.addColorStop(1, 'rgba(250, 204, 21, 0)');
-        ctx.fillStyle = glowGrad;
-        ctx.beginPath();
-        ctx.arc(bulb1X, bulb1Y - 25, 55 * brightness, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Glass Dome
-      ctx.fillStyle = isBulb1Lit ? `rgba(254, 240, 138, ${0.7 + brightness * 0.3})` : 'rgba(226, 232, 240, 0.4)';
-      ctx.strokeStyle = isBulb1Lit ? '#FBBF24' : '#94A3B8';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(bulb1X, bulb1Y - 25, 22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      // Filament
-      ctx.strokeStyle = isBulb1Lit ? '#FFFFFF' : '#64748B';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(bulb1X - 6, bulb1Y - 10);
-      ctx.lineTo(bulb1X - 4, bulb1Y - 25);
-      ctx.lineTo(bulb1X + 4, bulb1Y - 25);
-      ctx.lineTo(bulb1X + 6, bulb1Y - 10);
-      ctx.stroke();
-
-      ctx.fillStyle = '#334155';
-      ctx.font = 'bold 10px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(`Lamp A (${bulb1Resistance}Ω)`, bulb1X, bulb1Y + 28);
-      ctx.restore();
-
-      // Draw Component 4: Bulb 2 or Spinning Fan (Right/Mid)
-      if (circuitMode === 'series') {
-        // Bulb 2 on right bottom half
-        const bulb2X = rightX;
-        const bulb2Y = (midY + bottomY) / 2;
-
-        ctx.save();
-        ctx.fillStyle = '#E2E8F0';
-        ctx.beginPath();
-        ctx.roundRect(bulb2X - 24, bulb2Y - 14, 48, 28, 8);
-        ctx.fill();
-
-        const isBulb2Lit = isCircuitActive && bulb2Current > 0.05;
-        const b2Bright = Math.min(bulb2Current * 1.5, 1.4);
-
-        if (isBulb2Lit) {
-          const glow2 = ctx.createRadialGradient(bulb2X, bulb2Y - 25, 5, bulb2X, bulb2Y - 25, 55 * b2Bright);
-          glow2.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
-          glow2.addColorStop(0.5, 'rgba(250, 204, 21, 0.5)');
-          glow2.addColorStop(1, 'rgba(250, 204, 21, 0)');
-          ctx.fillStyle = glow2;
-          ctx.beginPath();
-          ctx.arc(bulb2X, bulb2Y - 25, 55 * b2Bright, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        ctx.fillStyle = isBulb2Lit ? `rgba(254, 240, 138, ${0.7 + b2Bright * 0.3})` : 'rgba(226, 232, 240, 0.4)';
-        ctx.strokeStyle = isBulb2Lit ? '#FBBF24' : '#94A3B8';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(bulb2X, bulb2Y - 25, 22, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#334155';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Lamp B (${bulb2Resistance}Ω)`, bulb2X, bulb2Y + 28);
-        ctx.restore();
-
-      } else if (circuitMode === 'parallel') {
-        // Center branch Bulb 2
-        const b2X = (leftX + rightX) / 2;
-        const b2Y = midY;
-
-        ctx.save();
-        ctx.fillStyle = '#E2E8F0';
-        ctx.beginPath();
-        ctx.roundRect(b2X - 24, b2Y - 14, 48, 28, 8);
-        ctx.fill();
-
-        const isB2Lit = isCircuitActive && branchSwitchClosed && bulb2Current > 0.05;
-        const b2Bright = Math.min(bulb2Current * 1.5, 1.4);
-
-        if (isB2Lit) {
-          const glow = ctx.createRadialGradient(b2X, b2Y - 25, 5, b2X, b2Y - 25, 55 * b2Bright);
+        // Radiant Outer Glow (Scales dynamically with voltage!)
+        if (isBulbLit && !isBroken) {
+          const glowRadius = 35 + currentVoltage * 5.5;
+          const glow = ctx.createRadialGradient(0, -6, 5, 0, -6, glowRadius);
           glow.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
-          glow.addColorStop(0.5, 'rgba(250, 204, 21, 0.5)');
-          glow.addColorStop(1, 'rgba(250, 204, 21, 0)');
+          glow.addColorStop(0.4, 'rgba(250, 204, 21, 0.55)');
+          glow.addColorStop(1, 'rgba(253, 224, 71, 0)');
           ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(b2X, b2Y - 25, 55 * b2Bright, 0, Math.PI * 2);
+          ctx.arc(0, -6, glowRadius, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        ctx.fillStyle = isB2Lit ? `rgba(254, 240, 138, ${0.7 + b2Bright * 0.3})` : 'rgba(226, 232, 240, 0.4)';
-        ctx.strokeStyle = isB2Lit ? '#FBBF24' : '#94A3B8';
-        ctx.lineWidth = 2.5;
+        // Glass Bulb Dome
+        ctx.fillStyle = isBroken
+          ? 'rgba(248, 113, 113, 0.35)'
+          : isBulbLit
+          ? '#FEF08A'
+          : '#F1F5F9';
         ctx.beginPath();
-        ctx.arc(b2X, b2Y - 25, 22, 0, Math.PI * 2);
+        ctx.arc(0, -6, 22, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.strokeStyle = isBroken ? '#EF4444' : isBulbLit ? '#FBBF24' : '#CBD5E1';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.fillStyle = '#334155';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Branch Lamp (${bulb2Resistance}Ω)`, b2X, b2Y + 28);
+        // Filament
+        if (isBroken) {
+          // Broken gap in filament
+          ctx.strokeStyle = '#EF4444';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-7, 8);
+          ctx.lineTo(-4, -6);
+          ctx.moveTo(4, -3);
+          ctx.lineTo(7, 8);
+          ctx.stroke();
+
+          // Crack lines
+          ctx.strokeStyle = '#DC2626';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-2, -14);
+          ctx.lineTo(2, -8);
+          ctx.lineTo(-1, -4);
+          ctx.stroke();
+        } else {
+          ctx.strokeStyle = isBulbLit ? '#DC2626' : '#94A3B8';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-6, 8);
+          ctx.lineTo(-3, -8);
+          ctx.lineTo(0, -4);
+          ctx.lineTo(3, -8);
+          ctx.lineTo(6, 8);
+          ctx.stroke();
+        }
+
         ctx.restore();
 
-      } else {
-        // Spinning Fan Motor
-        const fanX = rightX;
-        const fanY = (topY + bottomY) / 2;
+        // Label
+        ctx.fillStyle = isBroken ? '#DC2626' : '#475569';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, bx, by + 46);
 
+        if (isBroken) {
+          ctx.fillStyle = '#EF4444';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillText(circuitMode === 'series' ? '⚡ BROKEN (Loop Broken)' : '⚡ BROKEN (Branch Off)', bx, by + 58);
+        }
+      };
+
+      // Draw Fan Component Helper with broken state
+      const drawFan = (fx: number, fy: number, label: string, isFanSpinning: boolean, isBroken: boolean = false) => {
         ctx.save();
-        ctx.translate(fanX, fanY);
-
-        // Fan Motor Casing
-        ctx.fillStyle = '#A78BFA';
+        ctx.translate(fx, fy);
+        ctx.fillStyle = isBroken ? '#F87171' : '#F472B6';
         ctx.beginPath();
-        ctx.roundRect(-25, -25, 50, 50, 14);
+        ctx.roundRect(-20, -20, 40, 40, 10);
         ctx.fill();
 
-        // Outer Protective Fan Guard Cage
-        ctx.strokeStyle = '#DDD6FE';
-        ctx.lineWidth = 2.5;
+        // Guard ring
+        ctx.strokeStyle = isBroken ? '#EF4444' : '#FBCFE8';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(0, 0, 36, 0, Math.PI * 2);
+        ctx.arc(0, 0, 26, 0, Math.PI * 2);
         ctx.stroke();
 
-        // 3 Spinning Pastel Blades
-        ctx.rotate(fanRotationRef.current);
-        ctx.fillStyle = '#38BDF8';
+        // Blades
+        ctx.rotate(!isBroken && isFanSpinning ? fanRotationRef.current : 0);
+        ctx.fillStyle = isBroken ? '#94A3B8' : '#38BDF8';
         for (let b = 0; b < 3; b++) {
           ctx.rotate((Math.PI * 2) / 3);
           ctx.beginPath();
-          ctx.ellipse(0, -18, 9, 18, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, -12, 6, 13, 0, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Center hub
-        ctx.fillStyle = '#F59E0B';
+        ctx.fillStyle = '#FDE047';
         ctx.beginPath();
-        ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
 
-        ctx.fillStyle = '#334155';
+        ctx.fillStyle = isBroken ? '#DC2626' : '#475569';
         ctx.font = 'bold 10px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`Fan Motor (${fanResistance}Ω)`, fanX, fanY + 50);
+        ctx.fillText(label, fx, fy + 42);
+
+        if (isBroken) {
+          ctx.fillStyle = '#EF4444';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillText(circuitMode === 'series' ? '⚡ BROKEN (Loop Broken)' : '⚡ BROKEN (Branch Off)', fx, fy + 54);
+        }
+      };
+
+      // 1. Render Series vs Parallel Circuit Wires
+      if (circuitMode === 'series') {
+        // SERIES CIRCUIT: Single continuous perimeter loop
+        const sMidX = (leftRailX + rightRailX) / 2;
+        drawWireSegment([leftRailX, topRailY], [rightRailX, topRailY], isSeriesConducting);
+        drawWireSegment([rightRailX, topRailY], [rightRailX, bottomRailY], isSeriesConducting);
+        drawWireSegment([rightRailX, bottomRailY], [leftRailX, bottomRailY], isSeriesConducting);
+
+        // Components in series along top and right
+        drawBulb(sMidX, topRailY, 'Bulb 1 (Series)', isSeriesConducting, comp1Broken);
+        if (!useFanOnBranch2) {
+          drawBulb(rightRailX, (topRailY + bottomRailY) / 2, 'Bulb 2 (Series)', isSeriesConducting, comp2Broken);
+        } else {
+          drawFan(rightRailX, (topRailY + bottomRailY) / 2, 'Fan Motor', isSeriesConducting, comp2Broken);
+        }
+      } else {
+        // PARALLEL CIRCUIT:
+        // Shared power supply on the left feeds top main wire and bottom return wire.
+        // Both parallel branches are permanently connected to the main circuit wires!
+        const anyBranchConducting = b1Conducting || b2Conducting;
+
+        // Main Top Wire
+        drawWireSegment([leftRailX, topRailY], [branch1X, topRailY], anyBranchConducting);
+        drawWireSegment([branch1X, topRailY], [branch2X, topRailY], b2Conducting);
+
+        // Main Bottom Wire
+        drawWireSegment([branch2X, bottomRailY], [branch1X, bottomRailY], b2Conducting);
+        drawWireSegment([branch1X, bottomRailY], [leftRailX, bottomRailY], anyBranchConducting);
+
+        // Permanent Solder Junction Nodes connecting branches to the same two main wires
+        ctx.fillStyle = '#0284C7';
+        [
+          [branch1X, topRailY],
+          [branch1X, bottomRailY],
+          [branch2X, topRailY],
+          [branch2X, bottomRailY]
+        ].forEach(([jx, jy]) => {
+          ctx.beginPath();
+          ctx.arc(jx, jy, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Branch 1: Permanently connected vertical wire through component
+        drawWireSegment([branch1X, topRailY], [branch1X, bottomRailY], b1Conducting);
+        drawBulb(branch1X, (topRailY + bottomRailY) / 2, 'Branch 1: Bulb', b1Conducting, comp1Broken);
+
+        // Branch 2: Permanently connected vertical wire through component
+        drawWireSegment([branch2X, topRailY], [branch2X, bottomRailY], b2Conducting);
+        if (!useFanOnBranch2) {
+          drawBulb(branch2X, (topRailY + bottomRailY) / 2, 'Branch 2: Bulb', b2Conducting, comp2Broken);
+        } else {
+          drawFan(branch2X, (topRailY + bottomRailY) / 2, 'Branch 2: Fan', b2Conducting, comp2Broken);
+        }
       }
+
+      // 2. Power Supply (Battery or Generator) connected with EXACT SAME WIRE appearance & color!
+      const pX = leftRailX;
+      const pY = (topRailY + bottomRailY) / 2;
+      const powerConducting = isSeriesConducting || b1Conducting || b2Conducting || (isMasterLive && mainSwitchClosed);
+
+      // Top Cable from Power Supply (+) to Top Rail (moves UP towards top rail)
+      drawWireSegment([pX, pY - 34], [pX, topRailY], powerConducting);
+
+      // Bottom Cable from Bottom Rail to Power Supply (-) (moves UPWARDS towards negative terminal)
+      drawWireSegment([pX, bottomRailY], [pX, pY + 34], powerConducting);
+
+      // Battery / Generator Body
+      ctx.save();
+      if (powerSource === 'battery') {
+        ctx.fillStyle = '#A855F7';
+        ctx.beginPath();
+        ctx.roundRect(pX - 24, pY - 34, 48, 68, 12);
+        ctx.fill();
+
+        // Terminal studs
+        ctx.fillStyle = '#EF4444';
+        ctx.fillRect(pX - 10, pY - 40, 20, 7);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('+', pX, pY - 33);
+
+        ctx.fillStyle = '#1E293B';
+        ctx.fillRect(pX - 10, pY + 33, 20, 7);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('-', pX, pY + 39);
+
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('BATTERY', pX, pY);
+        ctx.fillText(`${currentVoltage.toFixed(1)}V`, pX, pY + 14);
+      } else {
+        ctx.fillStyle = '#38BDF8';
+        ctx.beginPath();
+        ctx.roundRect(pX - 26, pY - 34, 52, 68, 12);
+        ctx.fill();
+
+        // Terminals
+        ctx.fillStyle = '#EF4444';
+        ctx.fillRect(pX - 10, pY - 40, 20, 7);
+        ctx.fillStyle = '#1E293B';
+        ctx.fillRect(pX - 10, pY + 33, 20, 7);
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(pX, pY - 6, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#0284C7';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('GEN', pX, pY - 3);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.fillText('GENERATOR', pX, pY + 11);
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(`${currentVoltage.toFixed(1)}V`, pX, pY + 23);
+      }
+      ctx.restore();
+
+      // 3. Main Switch on Bottom Rail (Matching Visual Open / Closed Position)
+      const swX = (leftRailX + (circuitMode === 'parallel' ? branch1X : rightRailX)) / 2;
+      const swY = bottomRailY;
+
+      ctx.save();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(swX - 28, swY - 14, 56, 28, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Fixed brass contacts
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.arc(swX - 16, swY, 4, 0, Math.PI * 2);
+      ctx.arc(swX + 16, swY, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Switch knife arm
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(swX - 16, swY);
+      if (mainSwitchClosed) {
+        // ON: Closed contact bridge
+        ctx.lineTo(swX + 16, swY);
+      } else {
+        // OFF: Open tilted arm at 45 degrees
+        ctx.lineTo(swX + 4, swY - 22);
+      }
+      ctx.stroke();
+
+      // Switch handle knob
+      ctx.fillStyle = mainSwitchClosed ? '#22C55E' : '#EF4444';
+      ctx.beginPath();
+      ctx.arc(mainSwitchClosed ? swX + 16 : swX + 4, mainSwitchClosed ? swY : swY - 22, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // State label
+      ctx.fillStyle = mainSwitchClosed ? '#16A34A' : '#DC2626';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(mainSwitchClosed ? 'SWITCH: ON (Closed)' : 'SWITCH: OFF (Open)', swX, swY + 26);
+      ctx.restore();
 
       animFrameRef.current = requestAnimationFrame(render);
     };
 
     animFrameRef.current = requestAnimationFrame(render);
-
     return () => {
-      isRunning = false;
+      isLive = false;
       cancelAnimationFrame(animFrameRef.current);
     };
-  }, [circuitMode, powerSource, batteryVoltage, generatorRpm, mainSwitchClosed, branchSwitchClosed, bulb1Resistance, bulb2Resistance, fanResistance, isCircuitActive, currentTotal, bulb1Current, bulb2Current, fanCurrent]);
-
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Toggle switch if clicked near switch
-    const swX = canvas.clientWidth / 2;
-    const swY = canvas.clientHeight - 40;
-    if (Math.hypot(x - swX, y - swY) < 55) {
-      setMainSwitchClosed(!mainSwitchClosed);
-    }
-  };
+  }, [circuitMode, powerSource, mainSwitchClosed, comp1Broken, comp2Broken, currentVoltage, useFanOnBranch2, isSeriesConducting, b1Conducting, b2Conducting, isMasterLive]);
 
   return (
     <div className="space-y-6">
+      
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-amber-50/80 p-4 sm:p-5 rounded-3xl border border-amber-200/80">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md">
-            <Zap className="w-6 h-6 animate-pulse" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FCE7F3] p-5 rounded-3xl border border-pink-200">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-pink-500 text-white flex items-center justify-center shadow-xs">
+            <Zap className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Circuit Testing Laboratory
+            <h2 className="text-xl sm:text-2xl font-black text-pink-950 tracking-tight">
+              Circuit Testing
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-              Build realistic 3D series and parallel circuits. Wire batteries, hand generators, lamps, and spinning fans!
+            <p className="text-xs sm:text-sm text-pink-800">
+              Build series and parallel circuits. Test broken components, adjust voltage, and discover how currents flow!
             </p>
           </div>
         </div>
-
-        <button
-          onClick={onOpenQuiz}
-          className="self-start sm:self-center px-4 py-2.5 rounded-2xl text-sm font-bold bg-white text-amber-700 hover:bg-amber-100 border border-amber-200 shadow-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
-        >
-          <HelpCircle className="w-4 h-4 text-amber-600" />
-          <span>Electronics Quiz</span>
-        </button>
       </div>
 
-      {/* Main Sandbox Grid */}
+      {/* Main Workbench Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Stage (Breadboard Canvas) */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col items-center">
+        <div className="lg:col-span-8 bg-white rounded-3xl p-5 sm:p-6 border border-pink-200 shadow-xs flex flex-col items-center">
           
-          {/* Telemetry Bar */}
-          <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-3 text-xs font-semibold">
-            <div className="flex items-center gap-3">
-              <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${
-                isCircuitActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'
-              }`}>
-                <Power className="w-3.5 h-3.5" />
-                <span>{isCircuitActive ? 'Circuit CLOSED (Live)' : 'Circuit OPEN (Halted)'}</span>
-              </span>
+          <div className="w-full flex items-center justify-between mb-3 text-xs font-semibold">
+            <span className={`px-2.5 py-1 rounded-lg ${
+              isSeriesConducting || b1Conducting || b2Conducting
+                ? 'bg-emerald-100 text-emerald-800 font-bold'
+                : 'bg-slate-100 text-slate-500 font-bold'
+            }`}>
+              {isSeriesConducting || b1Conducting || b2Conducting
+                ? '⚡ Electricity Flowing!'
+                : !mainSwitchClosed
+                ? 'Switch is OFF (Path Open)'
+                : circuitMode === 'series' && (comp1Broken || comp2Broken)
+                ? 'Circuit Stopped (Component Broken)'
+                : 'Circuit Idle'}
+            </span>
 
-              {isShortCircuit && (
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 border border-rose-300 animate-pulse font-bold">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>SHORT CIRCUIT!</span>
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3 font-mono text-slate-700">
-              <span>V: <strong className="text-amber-600">{activeVoltage.toFixed(1)}V</strong></span>
-              <span>I: <strong className="text-blue-600">{currentTotal.toFixed(2)}A</strong></span>
-              <span>Req: <strong className="text-purple-600">{equivalentResistance.toFixed(1)}Ω</strong></span>
-            </div>
+            <span className="text-purple-900 font-bold bg-[#F3E8FF] px-2.5 py-1 rounded-lg">
+              Voltage: {currentVoltage.toFixed(1)}V ({currentVoltage < 3.5 ? 'Dim Light' : currentVoltage < 8.5 ? 'Normal Light' : 'Super Bright!'})
+            </span>
           </div>
 
           {/* Canvas Viewport */}
-          <div className="relative w-full h-[400px] sm:h-[460px] bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-inner select-none">
-            <canvas
-              ref={canvasRef}
-              onClick={handleCanvasClick}
-              className="w-full h-full block cursor-pointer"
-            />
+          <div className="relative w-full h-[360px] sm:h-[420px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner select-none">
+            <canvas ref={canvasRef} className="w-full h-full block" />
           </div>
 
-          {/* Quick Hardware Controls below Breadboard */}
+          {/* Master Switch and Component Working / Broken Controls */}
           <div className="w-full mt-4 flex flex-wrap items-center justify-between gap-3">
+            {/* Clear ON / OFF Switch Control */}
+            <button
+              onClick={() => setMainSwitchClosed(!mainSwitchClosed)}
+              className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer flex items-center gap-2 ${
+                mainSwitchClosed
+                  ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              }`}
+            >
+              <Power className="w-4 h-4" />
+              <span>Main Switch: {mainSwitchClosed ? 'Turn OFF' : 'Turn ON'}</span>
+            </button>
+
+            {/* Individual Broken / Working controls for Bulb 1 and Bulb 2 / Fan */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setMainSwitchClosed(!mainSwitchClosed)}
-                className={`px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm flex items-center gap-2 transition-all cursor-pointer ${
-                  mainSwitchClosed
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    : 'bg-rose-600 hover:bg-rose-700 text-white'
+                onClick={() => setComp1Broken(!comp1Broken)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                  !comp1Broken
+                    ? 'bg-emerald-100 border-emerald-400 text-emerald-900'
+                    : 'bg-rose-100 border-rose-400 text-rose-900'
                 }`}
               >
-                <Power className="w-4 h-4" />
-                <span>{mainSwitchClosed ? 'Open Switch (Cut Power)' : 'Close Switch (Connect)'}</span>
+                <span>{circuitMode === 'series' ? 'Bulb 1' : 'Branch 1 Bulb'}: {!comp1Broken ? 'Working' : 'Broken'}</span>
               </button>
 
-              {circuitMode === 'parallel' && (
-                <button
-                  onClick={() => setBranchSwitchClosed(!branchSwitchClosed)}
-                  className={`px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                    branchSwitchClosed
-                      ? 'bg-purple-100 border-purple-300 text-purple-800'
-                      : 'bg-slate-100 border-slate-200 text-slate-600'
-                  }`}
-                >
-                  Branch 2: {branchSwitchClosed ? 'Connected' : 'Disconnected'}
-                </button>
-              )}
-            </div>
-
-            {powerSource === 'generator' && (
               <button
-                onClick={crankGenerator}
-                className="px-5 py-2.5 rounded-xl font-bold text-white bg-gradient-to-r from-pink-500 to-amber-500 hover:from-pink-600 hover:to-amber-600 shadow-sm flex items-center gap-2 active:scale-95 transition-all cursor-pointer text-sm"
+                onClick={() => setComp2Broken(!comp2Broken)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                  !comp2Broken
+                    ? 'bg-emerald-100 border-emerald-400 text-emerald-900'
+                    : 'bg-rose-100 border-rose-400 text-rose-900'
+                }`}
               >
-                <BatteryCharging className="w-4 h-4" />
-                <span>Crank Generator! ({generatorRpm} RPM)</span>
+                <span>{useFanOnBranch2 ? 'Fan' : (circuitMode === 'series' ? 'Bulb 2' : 'Branch 2 Bulb')}: {!comp2Broken ? 'Working' : 'Broken'}</span>
               </button>
-            )}
+            </div>
           </div>
         </div>
 
         {/* Right Configuration Deck */}
         <div className="lg:col-span-4 space-y-5">
           
-          {/* Circuit Architecture Presets */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+          {/* Voltage Cursor/Slider */}
+          <div className="bg-white rounded-3xl p-5 border border-pink-200 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-slate-900 text-sm">
+                Voltage Cursor (Slider)
+              </h3>
+              <span className="font-mono text-purple-700 font-bold text-sm bg-purple-100 px-2.5 py-0.5 rounded-lg">
+                {currentVoltage.toFixed(1)}V
+              </span>
+            </div>
+
+            <input
+              type="range"
+              min="1.5"
+              max="12.0"
+              step="0.5"
+              value={currentVoltage}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                if (powerSource === 'generator') {
+                  setGeneratorVoltage(val);
+                } else {
+                  setBatteryVoltage(val);
+                }
+              }}
+              className="w-full accent-purple-600 cursor-pointer h-2 bg-purple-200 rounded-lg"
+            />
+
+            <div className="flex justify-between text-[11px] font-bold text-slate-500">
+              <span className="text-amber-700">Dim (1.5V)</span>
+              <span className="text-emerald-700">Normal (6V)</span>
+              <span className="text-purple-700">Bright (12V)</span>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-snug">
+              Slide to increase or decrease {powerSource === 'generator' ? 'generator' : 'battery'} voltage. Notice how bulb brightness scales directly with voltage!
+            </p>
+          </div>
+
+          {/* Circuit Topology: Series or Parallel */}
+          <div className="bg-white rounded-3xl p-5 border border-pink-200 shadow-xs space-y-3">
             <h3 className="font-extrabold text-slate-900 text-sm">
-              Circuit Topology Preset
+              Circuit Topology
             </h3>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => { setCircuitMode('series'); setPowerSource('battery'); }}
+                onClick={() => setCircuitMode('series')}
                 className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
-                  circuitMode === 'series' && powerSource === 'battery'
-                    ? 'border-amber-500 bg-amber-50/60 ring-1 ring-amber-400 font-bold'
-                    : 'border-slate-200 hover:border-slate-300'
+                  circuitMode === 'series'
+                    ? 'border-pink-500 bg-[#FCE7F3] font-bold text-pink-950'
+                    : 'border-slate-200 text-slate-700 hover:border-pink-300'
                 }`}
               >
-                <div className="text-xs text-amber-900">Series Dual Lamps</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Single loop; voltages add</div>
+                <div className="text-xs sm:text-sm font-bold">1. Series Circuit</div>
+                <div className="text-[11px] text-slate-500 mt-1">Single continuous path (if one breaks, all stop!)</div>
               </button>
 
               <button
-                onClick={() => { setCircuitMode('parallel'); setPowerSource('battery'); }}
+                onClick={() => setCircuitMode('parallel')}
                 className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
                   circuitMode === 'parallel'
-                    ? 'border-amber-500 bg-amber-50/60 ring-1 ring-amber-400 font-bold'
-                    : 'border-slate-200 hover:border-slate-300'
+                    ? 'border-pink-500 bg-[#FCE7F3] font-bold text-pink-950'
+                    : 'border-slate-200 text-slate-700 hover:border-pink-300'
                 }`}
               >
-                <div className="text-xs text-amber-900">Parallel Dual Lamps</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Independent branches</div>
-              </button>
-
-              <button
-                onClick={() => { setCircuitMode('fan-bulb'); setPowerSource('battery'); }}
-                className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
-                  circuitMode === 'fan-bulb'
-                    ? 'border-amber-500 bg-amber-50/60 ring-1 ring-amber-400 font-bold'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <div className="text-xs text-amber-900">Lamp & Motor Fan</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Light + kinetic output</div>
-              </button>
-
-              <button
-                onClick={() => { setCircuitMode('generator-loop'); setPowerSource('generator'); }}
-                className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
-                  powerSource === 'generator'
-                    ? 'border-amber-500 bg-amber-50/60 ring-1 ring-amber-400 font-bold'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <div className="text-xs text-amber-900">Hand Dynamo Loop</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Crank to generate volts</div>
+                <div className="text-xs sm:text-sm font-bold">2. Parallel Circuit</div>
+                <div className="text-[11px] text-slate-500 mt-1">Separate independent branches</div>
               </button>
             </div>
           </div>
 
-          {/* Power Source Settings */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+          {/* Power Supply: Battery or Generator */}
+          <div className="bg-white rounded-3xl p-5 border border-pink-200 shadow-xs space-y-3">
             <h3 className="font-extrabold text-slate-900 text-sm">
-              Power Supply Source
+              Power Supply
             </h3>
-
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setPowerSource('battery')}
-                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                  powerSource === 'battery' ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-50 border-slate-200'
+                className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
+                  powerSource === 'battery'
+                    ? 'border-pink-500 bg-[#FCE7F3] font-bold text-pink-950'
+                    : 'border-slate-200 text-slate-700 hover:border-pink-300'
                 }`}
               >
-                DC Battery Pack
+                <span className="text-xs sm:text-sm font-bold block">🔋 Battery Cell</span>
+                <span className="text-[11px] text-slate-500 leading-snug mt-0.5 block">Chemical DC source</span>
               </button>
+
               <button
                 onClick={() => setPowerSource('generator')}
-                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                  powerSource === 'generator' ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-50 border-slate-200'
+                className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
+                  powerSource === 'generator'
+                    ? 'border-pink-500 bg-[#FCE7F3] font-bold text-pink-950'
+                    : 'border-slate-200 text-slate-700 hover:border-pink-300'
                 }`}
               >
-                Hand Dynamo
+                <span className="text-xs sm:text-sm font-bold block">⚙️ Generator</span>
+                <span className="text-[11px] text-slate-500 leading-snug mt-0.5 block">Mechanical spin source</span>
               </button>
             </div>
-
-            {powerSource === 'battery' ? (
-              <div className="space-y-1.5 pt-2">
-                <div className="flex justify-between text-xs font-semibold text-slate-700">
-                  <span>Battery Potential</span>
-                  <span className="font-mono text-amber-700">{batteryVoltage} Volts</span>
-                </div>
-                <div className="flex gap-1.5">
-                  {[1.5, 3.0, 6.0, 9.0, 12.0].map(v => (
-                    <button
-                      key={v}
-                      onClick={() => setBatteryVoltage(v)}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                        batteryVoltage === v ? 'bg-amber-500 text-white border-amber-600' : 'bg-slate-100 border-slate-200 text-slate-600'
-                      }`}
-                    >
-                      {v}V
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="pt-2 text-xs text-slate-600 space-y-1">
-                <p>Click the <strong>"Crank Generator"</strong> button repeatedly to turn the dynamo coil through the magnetic field.</p>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-pink-500 to-amber-500 transition-all"
-                    style={{ width: `${(generatorRpm / 120) * 100}%` }}
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Component Resistances (Ohm values) */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+          {/* Component Toggle (Fan vs Bulb) */}
+          <div className="bg-white rounded-3xl p-5 border border-pink-200 shadow-xs space-y-3">
             <h3 className="font-extrabold text-slate-900 text-sm">
-              Component Resistances (Load)
+              Load Component Type
             </h3>
-
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs font-semibold text-slate-700">
-                <span>Lamp A Filament Resistance</span>
-                <span className="font-mono text-blue-600">{bulb1Resistance} Ω</span>
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="30"
-                value={bulb1Resistance}
-                onChange={e => setBulb1Resistance(Number(e.target.value))}
-                className="w-full accent-blue-600 cursor-pointer"
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setUseFanOnBranch2(false)}
+                className={`p-2.5 rounded-xl text-center border text-xs font-bold transition-all cursor-pointer ${
+                  !useFanOnBranch2 ? 'bg-pink-100 border-pink-400 text-pink-950' : 'border-slate-200 text-slate-700'
+                }`}
+              >
+                💡 Two Light Bulbs
+              </button>
+              <button
+                onClick={() => setUseFanOnBranch2(true)}
+                className={`p-2.5 rounded-xl text-center border text-xs font-bold transition-all cursor-pointer ${
+                  useFanOnBranch2 ? 'bg-pink-100 border-pink-400 text-pink-950' : 'border-slate-200 text-slate-700'
+                }`}
+              >
+                💨 Bulb + Spinning Fan
+              </button>
             </div>
-
-            {circuitMode === 'series' || circuitMode === 'parallel' ? (
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs font-semibold text-slate-700">
-                  <span>Lamp B Filament Resistance</span>
-                  <span className="font-mono text-purple-600">{bulb2Resistance} Ω</span>
-                </div>
-                <input
-                  type="range"
-                  min="5"
-                  max="30"
-                  value={bulb2Resistance}
-                  onChange={e => setBulb2Resistance(Number(e.target.value))}
-                  className="w-full accent-purple-600 cursor-pointer"
-                />
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs font-semibold text-slate-700">
-                  <span>Fan Motor Armature Resistance</span>
-                  <span className="font-mono text-emerald-600">{fanResistance} Ω</span>
-                </div>
-                <input
-                  type="range"
-                  min="5"
-                  max="30"
-                  value={fanResistance}
-                  onChange={e => setFanResistance(Number(e.target.value))}
-                  className="w-full accent-emerald-600 cursor-pointer"
-                />
-              </div>
-            )}
           </div>
 
         </div>
 
       </div>
+
+      {/* Fun Facts Area with Quiz Button directly beneath */}
+      <FunFactsSection gameId="circuit-testing" onOpenQuiz={onOpenQuiz} />
+
     </div>
   );
 };

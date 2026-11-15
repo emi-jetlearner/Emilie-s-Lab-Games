@@ -4,690 +4,648 @@ export const QUIZ_QUESTION_BANKS: Record<GameId, QuizQuestion[]> = {
   'crystal-growing': [
     {
       id: 'cg-1',
-      question: 'What is required for crystals to begin forming from a liquid solution?',
-      options: ['Superheated steam', 'A supersaturated solution', 'Complete darkness', 'Constant magnetic field'],
+      question: 'What is a crystal made of?',
+      options: ['Stacked layers of paper', 'Atoms lined up in neat patterns', 'Hardened drops of paint', 'Frozen bubbles of air'],
       correctIndex: 1,
-      explanation: 'Crystals precipitate when a solution contains more dissolved solute than it can hold at equilibrium (supersaturation).'
+      explanation: 'Crystals are solids where atoms connect in neat, repeating 3D patterns!'
     },
     {
       id: 'cg-2',
-      question: 'What is the initial microscopic cluster of atoms that seeds crystal growth called?',
-      options: ['A nucleation site', 'A catalyst pod', 'An isotope ring', 'A meniscus core'],
+      question: 'Where do crystals begin growing?',
+      options: ['At a tiny nucleation site', 'Inside a storm cloud', 'At the bottom of the ocean only', 'Inside a magnet'],
       correctIndex: 0,
-      explanation: 'Nucleation is the initial stage where atoms or molecules cluster into a stable crystalline lattice that other molecules attach to.'
+      explanation: 'Nucleation is the tiny starting point where the first atoms lock together.'
     },
     {
       id: 'cg-3',
-      question: 'Why does table salt (sodium chloride) naturally grow into cubic crystals?',
-      options: ['It is carved by water currents', 'Its atomic lattice arranges in a repeating cubic grid', 'Air pressure pushes equally from four sides', 'Salt contains tiny square molds'],
-      correctIndex: 1,
-      explanation: 'Alternating Na+ and Cl- ions arrange in a face-centered cubic lattice geometry at the atomic scale.'
+      question: 'What shape does table salt naturally grow into?',
+      options: ['Round balls', 'Triangles', 'Little cubes', 'Flat circles'],
+      correctIndex: 2,
+      explanation: 'Salt atoms lock together in a square grid, making neat cubic crystals.'
     },
     {
       id: 'cg-4',
-      question: 'How does cooling rate affect the final size of growing crystals in nature?',
-      options: ['Slow cooling produces larger crystals', 'Fast cooling produces larger crystals', 'Cooling rate has zero effect on crystal size', 'Only freezing allows any crystals to form'],
-      correctIndex: 0,
-      explanation: 'Slow cooling gives atoms ample time to migrate and bond to existing lattice faces, resulting in fewer, larger crystals (like granite vs obsidian).'
+      question: 'What happens to crystals when liquid cools very slowly?',
+      options: ['They turn to dust', 'They grow into larger crystals', 'They melt into gas', 'They lose their color'],
+      correctIndex: 1,
+      explanation: 'Slow cooling gives atoms time to find their places and build bigger crystals!'
     },
     {
       id: 'cg-5',
-      question: 'What mineral makes the deep purple gemstone known as Amethyst?',
-      options: ['Beryl with chromium', 'Quartz with iron impurities and radiation', 'Diamond with nitrogen', 'Corundum with titanium'],
-      correctIndex: 1,
-      explanation: 'Amethyst is quartz (SiO2) colored purple by trace iron ions irradiated by natural gamma rays in the surrounding rock.'
+      question: 'What makes quartz crystals turn purple to become amethyst?',
+      options: ['A pinch of iron', 'Purple food dye', 'Lots of water', 'Sunlight'],
+      correctIndex: 0,
+      explanation: 'Tiny amounts of natural iron in the rock give amethyst its purple glow.'
     },
     {
       id: 'cg-6',
-      question: 'What property gives crystals their flat, sparkling planar faces?',
-      options: ['Surface friction', 'Cleavage along crystal lattice planes', 'Evaporation residue', 'Electrostatic polarity'],
+      question: 'What makes emerald crystals bright green?',
+      options: ['Seaweed', 'Chromium', 'Ice crystals', 'Tree sap'],
       correctIndex: 1,
-      explanation: 'Crystal faces follow internal atomic lattice planes where atomic bonding symmetry produces smooth geometric surfaces.'
+      explanation: 'Trace amounts of the mineral element chromium create the green color.'
     },
     {
       id: 'cg-7',
-      question: 'What is a "solute" in a crystal growing experiment?',
-      options: ['The liquid that dissolves solids', 'The solid substance being dissolved', 'The container holding the liquid', 'The temperature gauge'],
-      correctIndex: 1,
-      explanation: 'The solute is the substance being dissolved (such as alum, salt, or copper sulfate) in the solvent (usually water).'
+      question: 'Which of these is the hardest crystal on Earth?',
+      options: ['Diamond', 'Talc', 'Ice', 'Glass'],
+      correctIndex: 0,
+      explanation: 'Diamond is rated 10 on the hardness scale because its carbon atoms hold on super tightly!'
     },
     {
       id: 'cg-8',
-      question: 'Which of the following is an example of an amorphous solid rather than a true crystal?',
-      options: ['Quartz', 'Volcanic obsidian glass', 'Snowflake', 'Pyrite cube'],
+      question: 'How many sides does a snowflake crystal always have?',
+      options: ['4 sides', '6 sides', '8 sides', '10 sides'],
       correctIndex: 1,
-      explanation: 'Obsidian glass cools so rapidly that silica atoms freeze without forming an orderly crystalline lattice.'
+      explanation: 'Water molecules bond in hexagonal rings, giving snowflakes 6 beautiful points.'
     },
     {
       id: 'cg-9',
-      question: 'What crystal system has three axes of equal length meeting at 90-degree angles?',
-      options: ['Isometric (Cubic)', 'Hexagonal', 'Triclinic', 'Monoclinic'],
-      correctIndex: 0,
-      explanation: 'The isometric or cubic system has three perpendicular axes of identical length, as seen in halite and diamond.'
+      question: 'Why do crystals have shiny, flat sides?',
+      options: ['People polish them with wax', 'Their atoms line up along straight planes', 'Water washes them flat', 'Wind cuts them smooth'],
+      correctIndex: 1,
+      explanation: 'The straight rows of atoms create smooth, shiny geometric faces.'
     },
     {
       id: 'cg-10',
-      question: 'Why do snowflakes always have 6-fold radial symmetry?',
-      options: ['Wind spins them as they fall', 'Water molecules bond at 104.5° and form hexagonal rings', 'Earth has 6 magnetic poles', 'Gravity pulls at 60-degree increments'],
+      question: 'What is a "seed crystal"?',
+      options: ['A plant seed that grows flowers', 'A small crystal that helps a bigger one grow', 'A drop of fertilizer', 'A glass marble'],
       correctIndex: 1,
-      explanation: 'Hydrogen bonds between polar H2O molecules form an open hexagonal lattice, producing six-sided symmetry.'
+      explanation: 'A seed crystal gives new atoms a handy template to attach to.'
     },
     {
       id: 'cg-11',
-      question: 'What happens to a crystal if placed into an unsaturated solution of the same substance?',
-      options: ['It grows twice as fast', 'It will slowly dissolve back into liquid', 'It turns into gas instantly', 'It changes color to black'],
+      question: 'What is volcanic obsidian glass?',
+      options: ['A normal crystal', 'A rock that cooled so fast atoms had no time to form patterns', 'A soft sponge', 'A diamond'],
       correctIndex: 1,
-      explanation: 'An unsaturated solution can hold more dissolved ions, so molecules detach from the crystal surface back into solution.'
+      explanation: 'Obsidian cooled so quickly that atoms froze in place without making a crystal grid.'
     },
     {
       id: 'cg-12',
-      question: 'What tool is used in laboratories to view the internal atomic arrangement of crystals?',
-      options: ['Stethoscope', 'X-ray crystallography diffractometer', 'Geiger counter', 'Barometer'],
-      correctIndex: 1,
-      explanation: 'X-ray crystallography measures how X-rays diffract through crystal planes to map the 3D atomic arrangement.'
+      question: 'What happens if you drop a crystal in water that can dissolve more mineral?',
+      options: ['It dissolves back into the water', 'It explodes', 'It doubles in size instantly', 'It turns into gold'],
+      correctIndex: 0,
+      explanation: 'If the water isn’t full of minerals yet, atoms will slowly detach from the crystal.'
     },
     {
       id: 'cg-13',
-      question: 'What is a "seed crystal"?',
-      options: ['A biological plant seed', 'A pre-formed tiny crystal added to induce fast, orderly growth', 'A chemical fertilizer drop', 'A glass marble placed at the bottom'],
-      correctIndex: 1,
-      explanation: 'A seed crystal acts as a template for solute ions to crystallize onto, bypassing the random nucleation barrier.'
+      question: 'What gives crystals their different shapes, like columns or needles?',
+      options: ['How the atoms fit together', 'The temperature of the air outside', 'The shape of the bucket', 'The color of the stone'],
+      correctIndex: 0,
+      explanation: 'Different minerals connect their atoms in different geometric angles.'
     },
     {
       id: 'cg-14',
-      question: 'What gives emeralds their distinctive bright green coloration?',
-      options: ['Trace amounts of chromium or vanadium', 'High concentrations of pure iron', 'Encapsulated sea algae', 'Trapped carbon dioxide bubbles'],
-      correctIndex: 0,
-      explanation: 'Emerald is a variety of the mineral beryl (Be3Al2Si6O18) with trace chromium or vanadium replacing aluminum ions.'
+      question: 'Can you grow crystals at home with sugar or salt?',
+      options: ['No, only in space', 'Yes, by dissolving it in warm water and letting it cool', 'Only with a laser', 'Only under soil'],
+      correctIndex: 1,
+      explanation: 'You can easily grow sugar rock candy or salt crystals by letting water evaporate!'
     },
     {
       id: 'cg-15',
-      question: 'Which of the following crystals has the highest score (10) on the Mohs hardness scale?',
-      options: ['Talc', 'Topaz', 'Diamond', 'Corundum'],
-      correctIndex: 2,
-      explanation: 'Diamond consists of tightly bonded carbon atoms in a tetrahedral lattice, making it the hardest natural mineral.'
-    },
-    {
-      id: 'cg-16',
-      question: 'What is "efflorescence" in mineral crystals?',
-      options: ['The loss of water molecules from a hydrated crystal into dry air', 'Luminescence under blacklight', 'Rapid boiling of crystals', 'Instant magnetic attraction'],
+      question: 'Are all solid rocks made of crystals?',
+      options: ['Almost all rocks are made of mineral crystals', 'No, only ice is crystalline', 'Rocks are made of rubber', 'Rocks have zero crystals'],
       correctIndex: 0,
-      explanation: 'Hydrated crystals can lose water of crystallization into dry air, forming a powdery coating on their surface.'
+      explanation: 'Granite and most rocks are mixtures of tiny interlocking mineral crystals.'
     }
   ],
 
   'dna-creatures': [
     {
       id: 'dna-1',
-      question: 'What does the abbreviation "DNA" stand for?',
-      options: ['Deoxyribonucleic Acid', 'Dual Nitrogen Array', 'Dynamic Nuclear Acid', 'Direct Nucleotide Antigen'],
+      question: 'What is DNA compared to inside our bodies?',
+      options: ['A recipe book for building a living thing', 'A battery that never runs out', 'A shield against gravity', 'A pair of shoes'],
       correctIndex: 0,
-      explanation: 'DNA stands for Deoxyribonucleic Acid, the molecule carrying genetic instructions in all known living organisms.'
+      explanation: 'DNA holds the master instructions and recipes for building your body!'
     },
     {
       id: 'dna-2',
-      question: 'Which four chemical nitrogenous bases make up the rungs of the DNA ladder?',
-      options: ['Adenine, Thymine, Cytosine, Guanine', 'Alanine, Tyrosine, Cysteine, Glycine', 'Alpha, Theta, Chi, Gamma', 'Sodium, Potassium, Calcium, Magnesium'],
-      correctIndex: 0,
-      explanation: 'The four bases are Adenine (A), Thymine (T), Cytosine (C), and Guanine (G), which pair as A-T and C-G.'
+      question: 'What shape does a DNA molecule look like?',
+      options: ['A flat circle', 'A twisted ladder or double helix', 'A straight square bar', 'A triangle pyramid'],
+      correctIndex: 1,
+      explanation: 'DNA looks like a spiral staircase or twisted ladder called a double helix.'
     },
     {
       id: 'dna-3',
-      question: 'What is the term for different versions of the same gene, such as blue vs brown eyes?',
-      options: ['Alleles', 'Gametes', 'Ribosomes', 'Enzymes'],
-      correctIndex: 0,
-      explanation: 'Alleles are variant forms of a gene located at the same genetic locus on homologous chromosomes.'
+      question: 'What are genes?',
+      options: ['Clothes you wear', 'Small sections of DNA that decide specific traits', 'Cells in your stomach only', 'Types of bones'],
+      correctIndex: 1,
+      explanation: 'Genes are instructions that decide things like eye color, fur color, and height.'
     },
     {
       id: 'dna-4',
-      question: 'What grid diagram is commonly used in biology to calculate parental trait probability?',
-      options: ['Venn diagram', 'Punnett square', 'Fibonacci spiral', 'Bohr diagram'],
+      question: 'How much of its DNA does a baby creature get from each parent?',
+      options: ['100% from dad', 'Half from mom and half from dad', 'All from mom', 'It invents completely new DNA'],
       correctIndex: 1,
-      explanation: 'A Punnett square predicts the potential genotypes and phenotypes of offspring from parental alleles.'
+      explanation: 'Every baby inherits 50% of its genetic recipes from mom and 50% from dad.'
     },
     {
       id: 'dna-5',
-      question: 'What is the difference between a creature’s genotype and its phenotype?',
-      options: ['Genotype is genetic code; phenotype is physical appearance', 'Genotype is weight; phenotype is height', 'Genotype changes daily; phenotype never changes', 'There is no difference'],
-      correctIndex: 0,
-      explanation: 'Genotype refers to the specific alleles carried (e.g. Bb), while phenotype is the expressed observable trait (e.g. purple fur).'
+      question: 'What is a dominant trait?',
+      options: ['A trait that hides forever', 'A stronger trait that shows up easily', 'A trait that only birds have', 'A broken gene'],
+      correctIndex: 1,
+      explanation: 'Dominant traits show up even if a baby only inherits one copy of the gene.'
     },
     {
       id: 'dna-6',
-      question: 'If a dominant brown allele (B) pairs with a recessive blue allele (b), what eye color appears?',
-      options: ['Blue eyes', 'Brown eyes', 'Green eyes', 'Striped eyes'],
+      question: 'What are the four chemical letters of DNA?',
+      options: ['A, B, C, D', 'A, T, C, G', 'W, X, Y, Z', 'H, E, L, P'],
       correctIndex: 1,
-      explanation: 'Dominant alleles mask recessive ones in heterozygous individuals (Bb), expressing the dominant brown trait.'
+      explanation: 'Adenine (A), Thymine (T), Cytosine (C), and Guanine (G) make the rungs of DNA.'
     },
     {
       id: 'dna-7',
-      question: 'What geometric shape describes the iconic 3D structure of DNA?',
-      options: ['Triple spiral', 'Double helix', 'Planar hexagon', 'Conical ring'],
-      correctIndex: 1,
-      explanation: 'James Watson and Francis Crick (along with Rosalind Franklin’s X-ray photo 51) described DNA as a double helix.'
+      question: 'What letter does A always connect with in DNA?',
+      options: ['T', 'C', 'G', 'Z'],
+      correctIndex: 0,
+      explanation: 'In the DNA ladder, A always pairs with T, and C always pairs with G.'
     },
     {
       id: 'dna-8',
-      question: 'In genetics, what happens during "codominance"?',
-      options: ['Both parental alleles are fully and simultaneously expressed', 'One allele destroys the other', 'Neither allele is inherited', 'All offspring are identical clones'],
+      question: 'What is a mutation?',
+      options: ['A sudden, natural change in the DNA code', 'A clean bath', 'A type of animal food', 'A loud sound'],
       correctIndex: 0,
-      explanation: 'In codominance, both alleles are expressed equally without blending (like a cat with both orange and black patches).'
+      explanation: 'Mutations are natural changes in DNA that can introduce fun new traits.'
     },
     {
       id: 'dna-9',
-      question: 'How many chromosomes do human cells normally possess in their somatic nuclei?',
-      options: ['12 pairs (24 total)', '23 pairs (46 total)', '46 pairs (92 total)', '100 pairs'],
+      question: 'If two black cats carry a hidden recessive white fur gene, can they have a white kitten?',
+      options: ['No, never', 'Yes, if the kitten gets the white gene from both parents', 'Only in winter', 'Only if the kitten is a bird'],
       correctIndex: 1,
-      explanation: 'Humans have 23 pairs of chromosomes (46 total), with 23 inherited from each biological parent.'
+      explanation: 'When both parents pass down the recessive white gene, the baby can have white fur!'
     },
     {
       id: 'dna-10',
-      question: 'What cellular process halves chromosome number to produce reproductive gametes?',
-      options: ['Mitosis', 'Meiosis', 'Fermentation', 'Glycolysis'],
-      correctIndex: 1,
-      explanation: 'Meiosis is a specialized cell division that reduces chromosome count by half, producing haploid sperm or egg cells.'
+      question: 'Where is DNA kept inside an animal’s cells?',
+      options: ['In the nucleus control center', 'In the hair only', 'Outside the cell', 'In the fingernails only'],
+      correctIndex: 0,
+      explanation: 'The nucleus acts as the cell’s library to keep DNA recipes safe.'
     },
     {
       id: 'dna-11',
-      question: 'What is a sudden permanent change in an organism’s DNA sequence called?',
-      options: ['Mitosis', 'Mutation', 'Metabolism', 'Metamorphosis'],
-      correctIndex: 1,
-      explanation: 'A mutation is an alteration in nucleotide sequence, which can introduce novel traits into a population.'
+      question: 'Why don’t brothers and sisters look completely identical?',
+      options: ['They get different random mixes of genes from their parents', 'They eat different food', 'Genes change every day', 'They have different DNA parents'],
+      correctIndex: 0,
+      explanation: 'Each child gets a unique mix of parental genes, making everyone special!'
     },
     {
       id: 'dna-12',
-      question: 'What does it mean if an organism is "homozygous" for a specific trait?',
-      options: ['It carries two identical alleles for that gene', 'It has two completely different alleles', 'It has lost the gene entirely', 'It was grown in a petri dish'],
+      question: 'What grid tool do scientists use to predict baby traits?',
+      options: ['A Punnett square', 'A ruler', 'A clock', 'A calculator'],
       correctIndex: 0,
-      explanation: 'Homozygous means having two identical copies of an allele (such as BB or bb) at that genetic locus.'
+      explanation: 'A Punnett square helps show which traits offspring might inherit.'
     },
     {
       id: 'dna-13',
-      question: 'Which cellular organelles read messenger RNA to assemble proteins according to DNA code?',
-      options: ['Vacuoles', 'Ribosomes', 'Lysosomes', 'Chloroplasts'],
-      correctIndex: 1,
-      explanation: 'Ribosomes translate mRNA codon triplets into polypeptide amino acid chains to construct proteins.'
+      question: 'Do plants have DNA too?',
+      options: ['Yes, all living things have DNA', 'No, only animals', 'Only trees have DNA', 'Only mushrooms have DNA'],
+      correctIndex: 0,
+      explanation: 'Plants, animals, and mushrooms all rely on DNA to grow and live!'
     },
     {
       id: 'dna-14',
-      question: 'What is selective breeding (artificial selection)?',
-      options: ['Random mating in the wild', 'Humans deliberately choosing parents with desired traits', 'Using lasers to change fur color', 'Animals choosing their own habitats'],
-      correctIndex: 1,
-      explanation: 'Selective breeding involves selecting parents with specific phenotypic traits to pass those qualities on to future generations.'
+      question: 'What do we call the physical look of an animal (like brown eyes or striped fur)?',
+      options: ['Phenotype', 'Microscope', 'Telescope', 'Thermometer'],
+      correctIndex: 0,
+      explanation: 'Phenotype is the word for the physical traits you can actually see on the outside.'
     },
     {
       id: 'dna-15',
-      question: 'If two heterozygous parents (Bb x Bb) mate, what percentage of offspring is predicted to show the recessive trait (bb)?',
-      options: ['0%', '25%', '50%', '75%'],
-      correctIndex: 1,
-      explanation: 'The Punnett square yields 1 BB, 2 Bb, and 1 bb, meaning 1 in 4 (25%) will be homozygous recessive (bb).'
-    },
-    {
-      id: 'dna-16',
-      question: 'What molecule serves as an intermediate messenger carrying genetic recipes from the nucleus?',
-      options: ['Lipid', 'mRNA (Messenger RNA)', 'Glucose', 'Hemoglobin'],
-      correctIndex: 1,
-      explanation: 'mRNA transcribes code from nuclear DNA and transports it to ribosomes in the cytoplasm for translation.'
+      question: 'What do cells make using the instructions on DNA?',
+      options: ['Proteins', 'Plastic', 'Glass', 'Rock'],
+      correctIndex: 0,
+      explanation: 'Cells read DNA recipes to build proteins that make up muscles, fur, and skin.'
     }
   ],
 
   'circuit-testing': [
     {
       id: 'ct-1',
-      question: 'What mathematical formula represents Ohm’s Law?',
-      options: ['V = I × R', 'P = V / I', 'E = m × c²', 'F = m × a'],
-      correctIndex: 0,
-      explanation: 'Ohm’s law states that Voltage (V) equals Current (I) multiplied by Resistance (R).'
+      question: 'What is an electric circuit?',
+      options: ['A circle of stones', 'A closed loop that lets electricity flow', 'A broken wire', 'A wooden box'],
+      correctIndex: 1,
+      explanation: 'A circuit is a continuous path that lets electric energy travel from a power source and back.'
     },
     {
       id: 'ct-2',
-      question: 'What happens to the remaining bulbs in a simple SERIES circuit if one bulb burns out or is removed?',
-      options: ['They get twice as bright', 'All remaining bulbs go out immediately', 'They start flashing rapidly', 'Only the first bulb stays lit'],
-      correctIndex: 1,
-      explanation: 'A series circuit has only one continuous conductive loop; breaking any component opens the entire path.'
+      question: 'What happens to other bulbs in a SERIES circuit if one bulb is removed?',
+      options: ['They all go out', 'They get brighter', 'They turn green', 'Nothing happens'],
+      correctIndex: 0,
+      explanation: 'In series, there is only one path. If one part breaks, the whole circuit stops!'
     },
     {
       id: 'ct-3',
-      question: 'Why are household appliances and home lighting wired in PARALLEL circuits instead of series?',
-      options: ['Parallel circuits use less copper', 'Each device receives full line voltage and can operate independently', 'Parallel circuits generate free electricity', 'Series circuits only work with DC batteries'],
-      correctIndex: 1,
-      explanation: 'Parallel wiring ensures that switching off one appliance does not interrupt power to other appliances.'
+      question: 'Why are lights in our homes wired in PARALLEL circuits?',
+      options: ['So turning off one lamp doesn’t turn off every light in the house', 'Because parallel wire is made of gold', 'So they only work during daytime', 'Parallel circuits don’t need electricity'],
+      correctIndex: 0,
+      explanation: 'Parallel branches are independent, so each room can turn lights on or off separately!'
     },
     {
       id: 'ct-4',
-      question: 'What unit is used to measure electrical current?',
-      options: ['Volts', 'Amperes (Amps)', 'Ohms', 'Watts'],
-      correctIndex: 1,
-      explanation: 'Electrical current—the rate of charge flow through a conductor—is measured in Amperes (A).'
+      question: 'What does voltage mean?',
+      options: ['The pushing force that moves electricity', 'The weight of the battery', 'The color of the wire', 'The length of the cord'],
+      correctIndex: 0,
+      explanation: 'Voltage is the electrical pressure pushing energy through the circuit.'
     },
     {
       id: 'ct-5',
-      question: 'What is a "short circuit" and why is it dangerous in an electrical system?',
-      options: ['A circuit that is too short in length', 'A low-resistance connection that causes dangerously high current flow and heat', 'A circuit with dead batteries', 'A wire with too much insulation'],
-      correctIndex: 1,
-      explanation: 'A short circuit bypasses the electrical load, causing extreme current surges that can melt wires and spark fires.'
+      question: 'What happens to a light bulb when you increase the voltage?',
+      options: ['It glows brighter', 'It gets colder and freezes', 'It immediately turns off', 'It turns into a fan'],
+      correctIndex: 0,
+      explanation: 'Higher voltage pushes more energy through the bulb filament, making it shine brighter!'
     },
     {
       id: 'ct-6',
-      question: 'Which of the following materials is an electrical INSULATOR?',
-      options: ['Copper wire', 'Rubber casing', 'Aluminum foil', 'Silver bar'],
-      correctIndex: 1,
-      explanation: 'Rubber has tightly bound valence electrons that resist electric current, making it an excellent insulator.'
+      question: 'How does a generator create electricity?',
+      options: ['By spinning magnets near copper wire coils', 'By burning wood inside', 'By cooling water into ice', 'By blowing air on light bulbs'],
+      correctIndex: 0,
+      explanation: 'Moving magnetic fields push electrons through wire coils to generate power.'
     },
     {
       id: 'ct-7',
-      question: 'What is the function of a switch in an electrical circuit?',
-      options: ['To create extra electric charge', 'To safely open (break) or close (complete) the conductive loop', 'To change DC into AC power', 'To increase battery chemical capacity'],
-      correctIndex: 1,
-      explanation: 'A switch bridges or disconnects contact points, letting current flow when closed and halting it when open.'
+      question: 'What is the job of a switch in a circuit?',
+      options: ['To safely open or close the circuit loop', 'To change the color of the bulb', 'To make the wire longer', 'To make noise'],
+      correctIndex: 0,
+      explanation: 'A switch bridges the gap when ON to let electricity flow, and breaks it when OFF.'
     },
     {
       id: 'ct-8',
-      question: 'If two identical 6-Volt batteries are connected in SERIES (+ to -), what is the total voltage delivered?',
-      options: ['0 Volts', '3 Volts', '6 Volts', '12 Volts'],
-      correctIndex: 3,
-      explanation: 'Series battery voltages add directly together: 6V + 6V = 12V.'
+      question: 'Which of these materials is a good conductor of electricity?',
+      options: ['Copper metal', 'Rubber', 'Dry wood', 'Plastic'],
+      correctIndex: 0,
+      explanation: 'Copper and other metals let electrons flow freely, making them great conductors.'
     },
     {
       id: 'ct-9',
-      question: 'What device converts electrical energy into mechanical kinetic motion in a circuit?',
-      options: ['An electric motor', 'A capacitor', 'A resistor', 'A voltmeter'],
-      correctIndex: 0,
-      explanation: 'Electric motors use magnetic fields generated by electric current to rotate a shaft and spin fan blades.'
+      question: 'Why are electric wires covered in rubber or plastic?',
+      options: ['To keep the wire warm', 'To insulate the wire so we don’t get shocked', 'To make wires bouncy', 'To make wires heavier'],
+      correctIndex: 1,
+      explanation: 'Rubber and plastic are insulators that block electricity and keep us safe.'
     },
     {
       id: 'ct-10',
-      question: 'What unit measures electrical resistance?',
-      options: ['Ohm (Ω)', 'Tesla (T)', 'Joule (J)', 'Henry (H)'],
+      question: 'What unit do we use to measure electric current?',
+      options: ['Amps (Amperes)', 'Meters', 'Grams', 'Liters'],
       correctIndex: 0,
-      explanation: 'Resistance, which opposes current flow, is measured in Ohms (symbolized by the Greek letter Ω).'
+      explanation: 'Amps measure how much electrical charge is flowing through a wire each second.'
     },
     {
       id: 'ct-11',
-      question: 'What safety component contains a thin wire designed to melt and break the circuit during overcurrent?',
-      options: ['A fuse', 'A transformer', 'A diode', 'An alternator'],
+      question: 'What tiny particles actually move through a wire to make electricity?',
+      options: ['Electrons', 'Molecules of dust', 'Drops of water', 'Atoms of sand'],
       correctIndex: 0,
-      explanation: 'A fuse intentionally melts when current exceeds safe limits, protecting expensive equipment and preventing fires.'
+      explanation: 'Electrons are tiny particles with negative charge that drift through metal conductors.'
     },
     {
       id: 'ct-12',
-      question: 'What subatomic particles actually drift through a metal wire to produce electric current?',
-      options: ['Protons', 'Neutrons', 'Electrons', 'Photons'],
-      correctIndex: 2,
-      explanation: 'Negatively charged free valence electrons drift through the metallic lattice under an applied electric potential.'
+      question: 'What does a motor do in a circuit?',
+      options: ['Turns electrical energy into spinning motion (like a fan)', 'Stores water', 'Creates cold ice', 'Paints the wire'],
+      correctIndex: 0,
+      explanation: 'Motors use electromagnets to spin shafts and rotate fan blades!'
     },
     {
       id: 'ct-13',
-      question: 'What happens to the total resistance of a circuit when you add more branches in PARALLEL?',
-      options: ['Total resistance increases', 'Total resistance decreases', 'Total resistance stays exactly the same', 'Resistance drops to absolute zero'],
-      correctIndex: 1,
-      explanation: 'Adding parallel branches provides additional alternative pathways for current, lowering total equivalent resistance.'
+      question: 'What is a "short circuit"?',
+      options: ['A low-resistance path where electricity bypasses the bulb and gets too hot', 'A wire that is very short in length', 'A tiny toy light', 'A battery with no power'],
+      correctIndex: 0,
+      explanation: 'A short circuit bypasses the load, causing dangerous surges of current.'
     },
     {
       id: 'ct-14',
-      question: 'What happens to an incandescent bulb’s brightness if circuit voltage increases while resistance stays constant?',
-      options: ['It dims', 'It becomes brighter', 'Its color turns black', 'It stops drawing power'],
-      correctIndex: 1,
-      explanation: 'By Ohm’s Law and Joule heating ($P = V^2 / R$), higher voltage drives more current and produces more luminous power.'
+      question: 'If you connect two 6-Volt batteries in series, what is the total voltage?',
+      options: ['12 Volts', '0 Volts', '6 Volts', '3 Volts'],
+      correctIndex: 0,
+      explanation: 'In series, battery voltages add together: 6V + 6V = 12 Volts!'
     },
     {
       id: 'ct-15',
-      question: 'What kind of electricity is produced by a hand-crank generator using coils and magnets?',
-      options: ['Electromagnetic induction', 'Static combustion', 'Nuclear decay', 'Thermal sublimation'],
+      question: 'What makes the wire inside an incandescent bulb glow?',
+      options: ['Electric resistance heats the thin filament until it shines', 'Chemical liquid inside', 'Tiny mirrors reflecting sunlight', 'Radio waves'],
       correctIndex: 0,
-      explanation: 'Faraday’s law of induction explains that moving a magnetic field through a wire coil induces electrical current.'
-    },
-    {
-      id: 'ct-16',
-      question: 'Which instrument is connected in series with a circuit to measure its electric current?',
-      options: ['An ammeter', 'A barometer', 'A hydrometer', 'A seismograph'],
-      correctIndex: 0,
-      explanation: 'An ammeter has very low internal resistance and is wired in series so all current flows through it to be measured.'
+      explanation: 'Electricity squeezing through the thin tungsten wire heats it up until it glows white-hot.'
     }
   ],
 
   'catastrophe-simulations': [
     {
       id: 'cs-1',
-      question: 'What is the scientific difference between "magma" and "lava"?',
-      options: ['Magma is molten rock underground; lava is molten rock on Earth’s surface', 'Magma is solid; lava is liquid', 'Magma only exists on Mars', 'Lava is colder than magma'],
+      question: 'What is molten rock called while it is still trapped underground?',
+      options: ['Magma', 'Lava', 'Basalt', 'Obsidian'],
       correctIndex: 0,
-      explanation: 'Geologists call molten rock magma when beneath Earth’s crust, and lava once it erupts onto the surface.'
+      explanation: 'Geologists call underground molten rock magma, and surface molten rock lava.'
     },
     {
       id: 'cs-2',
-      question: 'How does the silica content (SiO2) of magma affect its viscosity and eruption style?',
-      options: ['High silica magma is runny and gentle', 'High silica magma is thick and sticky, causing explosive eruptions', 'Silica has no effect on volcanic eruptions', 'Silica makes lava freeze into ice'],
-      correctIndex: 1,
-      explanation: 'High-silica magmas (like rhyolite) are viscous and trap expanding volcanic gases, leading to violent explosive eruptions.'
+      question: 'What is molten rock called once it erupts onto Earth’s surface?',
+      options: ['Lava', 'Magma', 'Ice', 'Clay'],
+      correctIndex: 0,
+      explanation: 'Once it flows out into the open air, it is called lava.'
     },
     {
       id: 'cs-3',
-      question: 'What primary natural event triggers most devastating tsunamis?',
-      options: ['Hurricanes and strong wind', 'Vertical displacement of the seafloor by an undersea earthquake', 'Tidal gravity from the moon', 'Ship propellers'],
-      correctIndex: 1,
-      explanation: 'Subduction zone earthquakes abruptly push seafloor plates up or down, displacing immense volumes of water.'
+      question: 'What causes explosive volcanic eruptions instead of gentle lava flows?',
+      options: ['Thick, sticky magma trapping gas bubbles under high pressure', 'Cold weather', 'Ocean waves splashing inside', 'Loud thunder'],
+      correctIndex: 0,
+      explanation: 'Sticky magma traps expanding gas until pressure bursts violently like a shaken soda bottle!'
     },
     {
       id: 'cs-4',
-      question: 'What is "wave shoaling" as a tsunami approaches shallow coastal waters?',
-      options: ['Waves disappear completely', 'Wave speed decreases while wave height dramatically rises', 'Waves speed up to the speed of sound', 'Water turns into boiling vapor'],
-      correctIndex: 1,
-      explanation: 'In shallow water, friction compresses the wave energy, slowing the front of the wave and forcing water to build into a towering surge.'
+      question: 'What is a gentle, slow-flowing volcanic eruption called?',
+      options: ['An effusive eruption', 'A tornado', 'A blizzard', 'A sonic boom'],
+      correctIndex: 0,
+      explanation: 'Effusive eruptions happen when runny magma lets gas escape calmly, creating flowing lava rivers.'
     },
     {
       id: 'cs-5',
-      question: 'What warning sign often precedes the arrival of a tsunami wave on a shoreline?',
-      options: ['Sudden receding and drawback of coastal water exposing the seabed', 'Heavy snow falling on the ocean', 'The sun turning green', 'Instant silence of all birds globally'],
+      question: 'What is the large underground pool of molten rock beneath a volcano called?',
+      options: ['The magma chamber', 'A water well', 'The epicenter', 'A tectonic crack'],
       correctIndex: 0,
-      explanation: 'If the trough of the tsunami wave reaches shore first, water withdraws dramatically, exposing seafloor and reefs.'
+      explanation: 'The magma chamber is the hot underground reservoir feeding the volcano.'
     },
     {
       id: 'cs-6',
-      question: 'What scale measures the total energy released by an earthquake?',
-      options: ['Mohs scale', 'Moment Magnitude / Richter scale', 'Beaufort scale', 'Kelvin scale'],
-      correctIndex: 1,
-      explanation: 'Seismologists use the Richter and Moment Magnitude scales to quantify seismic energy released at the earthquake source.'
+      question: 'What is the central pipe that carries magma from underground up to the crater called?',
+      options: ['The conduit or vent', 'The chimney pipe', 'A water canal', 'A subway tunnel'],
+      correctIndex: 0,
+      explanation: 'The conduit is the main volcanic pipe connecting the magma chamber to the surface.'
     },
     {
       id: 'cs-7',
-      question: 'Each whole number increase on the Moment Magnitude scale represents roughly how much more energy released?',
-      options: ['2 times more', '10 times more', 'Approximately 32 times more energy', '1000 times more'],
-      correctIndex: 2,
-      explanation: 'Because it is logarithmic, a magnitude 7.0 earthquake releases about 31.6 times more energy than a 6.0.'
+      question: 'What warning sign often happens at the beach right before a tsunami arrives?',
+      options: ['The sea water pulls back, exposing the sandy ocean floor', 'Heavy snowfall', 'The sky turns completely purple', 'Fish fly into trees'],
+      correctIndex: 0,
+      explanation: 'The trough of the tsunami wave reaches the shore first, temporarily sucking water away from the beach!'
     },
     {
       id: 'cs-8',
-      question: 'Which seismic waves travel fastest through Earth’s interior and arrive first at seismographs?',
-      options: ['P-waves (Primary compressional waves)', 'S-waves (Secondary shear waves)', 'Rayleigh surface waves', 'Love waves'],
+      question: 'What natural event triggers most giant tsunamis?',
+      options: ['An undersea earthquake that lifts or drops the ocean floor', 'Strong wind from a storm', 'Ships speeding in the water', 'Tides from the moon'],
       correctIndex: 0,
-      explanation: 'P-waves are longitudinal compressional waves that travel fastest through rock and can pass through solids, liquids, and gases.'
+      explanation: 'Undersea tectonic fault slips suddenly displace huge amounts of ocean water.'
     },
     {
       id: 'cs-9',
-      question: 'What dangerous volcanic phenomenon consists of a superheated avalanche of gas, ash, and rock traveling over 100 km/h?',
-      options: ['A pyroclastic flow', 'A geyser', 'A fumarole', 'A mud crater'],
+      question: 'What causes earthquakes to happen?',
+      options: ['Tectonic plates grinding together and suddenly slipping', 'Animals stomping', 'Heavy rain soaking the ground', 'Cars driving on roads'],
       correctIndex: 0,
-      explanation: 'Pyroclastic flows are lethal high-density avalanches of scorching gas and volcanic debris reaching over 700°C.'
+      explanation: 'Earth’s crust pieces (tectonic plates) get stuck, build up pressure, and suddenly slip!'
     },
     {
       id: 'cs-10',
-      question: 'What is the point on Earth’s surface directly above where an earthquake fault rupture originates?',
-      options: ['The hypocenter', 'The epicenter', 'The caldera', 'The mantle plume'],
-      correctIndex: 1,
-      explanation: 'The focus or hypocenter is deep underground where slipping begins; the epicenter is the point directly above on the surface.'
+      question: 'What is an earthquake epicenter?',
+      options: ['The point on the surface directly above where the quake started underground', 'The center of the Earth', 'A cloud in the sky', 'A weather station'],
+      correctIndex: 0,
+      explanation: 'The focus is underground, and the epicenter is the surface point directly above it.'
     },
     {
       id: 'cs-11',
-      question: 'Why do buildings constructed on soft sand or saturated soil suffer more earthquake damage than those on bedrock?',
-      options: ['Soil liquefaction and seismic wave amplification occur', 'Soft sand absorbs all gravity', 'Bedrock vibrates much faster than sand', 'Sand attracts magnetic fields'],
+      question: 'What scale do scientists use to measure the size and energy of earthquakes?',
+      options: ['The Richter or Moment Magnitude scale', 'A thermometer', 'A wind gauge', 'The Mohs scale'],
       correctIndex: 0,
-      explanation: 'Unconsolidated water-saturated soil loses strength and behaves like quicksand (liquefaction), causing foundations to sink and collapse.'
+      explanation: 'The Richter and Moment Magnitude scales measure seismic energy released.'
     },
     {
       id: 'cs-12',
-      question: 'What is a "lahar" in volcanic science?',
-      options: ['A destructive volcanic mudflow of water, volcanic ash, and debris', 'A volcanic lightning storm', 'A cooled obsidian blade', 'A volcanic cloud that smells like roses'],
+      question: 'What fast seismic waves travel first from an earthquake?',
+      options: ['P-waves (Primary waves)', 'Sound waves', 'Ocean waves', 'Light waves'],
       correctIndex: 0,
-      explanation: 'Lahars occur when volcanic activity melts glaciers or heavy rain mobilizes thick ash into rushing concrete-like mudflows.'
+      explanation: 'Primary compressional waves travel fastest through solid rock and reach seismographs first.'
     },
     {
       id: 'cs-13',
-      question: 'What tectonic boundary feature forms when one tectonic plate dives beneath another into the hot mantle?',
-      options: ['A subduction zone', 'A mid-ocean ridge rift', 'A strike-slip transform fault', 'A meteor crater'],
+      question: 'What is a hot, rushing cloud of volcanic ash and gas called?',
+      options: ['A pyroclastic flow', 'A friendly breeze', 'A fog bank', 'A dust devil'],
       correctIndex: 0,
-      explanation: 'Subduction zones generate Earth’s most powerful earthquakes, deep ocean trenches, and volcanic island arcs.'
+      explanation: 'Pyroclastic flows are superheated avalanches of gas and ash racing down volcanoes.'
     },
     {
       id: 'cs-14',
-      question: 'What is a volcanic "caldera"?',
-      options: ['A large basin created when a volcano’s magma chamber empties and collapses inward', 'The tiny vent at the top of a sparkler', 'A frozen lava tube', 'A type of crystal found in pumice'],
+      question: 'What happens before a volcano erupts that warns scientists?',
+      options: ['Small earthquakes and gentle rumbling shake the mountain', 'The mountain turns green', 'Birds start singing louder', 'The wind stops completely'],
       correctIndex: 0,
-      explanation: 'A caldera forms when an enormous eruption drains the magma chamber underneath, causing the mountain summit to collapse.'
+      explanation: 'Rising magma cracks rock and causes small tremors and rumbling before an eruption!'
     },
     {
       id: 'cs-15',
-      question: 'How fast can a tsunami wave travel in deep open ocean waters (4000 meters deep)?',
-      options: ['10 km/h (running pace)', '50 km/h (car speed)', 'Over 700–800 km/h (jet airliner speed)', 'Speed of light'],
-      correctIndex: 2,
-      explanation: 'In deep water ($v = \\sqrt{gh}$), tsunamis travel at jetliner speeds (over 800 km/h) with barely noticeable wave heights until nearing shore.'
-    },
-    {
-      id: 'cs-16',
-      question: 'What engineering feature helps modern skyscrapers survive earthquake vibrations?',
-      options: ['Rigid unbending steel pins', 'Base isolators and tuned mass dampers that absorb seismic motion', 'Removing all interior walls', 'Building only with hollow glass'],
-      correctIndex: 1,
-      explanation: 'Base isolators decouple the building from shaking ground, while heavy tuned mass dampers swing oppositely to stabilize swaying.'
+      question: 'What should you do if you are at the coast and feel an earthquake or see the sea pull back?',
+      options: ['Move to high ground immediately away from the beach', 'Run out to look at the exposed shells', 'Go swimming in the ocean', 'Hide under a beach umbrella'],
+      correctIndex: 0,
+      explanation: 'A receding ocean is nature’s tsunami warning: always move quickly to high ground!'
     }
   ],
 
   'rocket-launching': [
     {
       id: 'rl-1',
-      question: 'Which of Sir Isaac Newton’s laws of motion explains how rocket engines generate forward thrust?',
-      options: ['Third Law: For every action, there is an equal and opposite reaction', 'First Law: An object at rest stays at rest', 'Second Law: F = m × a only', 'Law of Universal Gravitation only'],
+      question: 'What is rocket propulsion?',
+      options: ['The forward pushing force that launches a rocket', 'The paint on the outside', 'The radio inside the cabin', 'The wheels on the launchpad'],
       correctIndex: 0,
-      explanation: 'Expelling hot exhaust gases backwards at high velocity exerts an equal and opposite reaction force that drives the rocket forward.'
+      explanation: 'Propulsion is the thrust force created by engines to drive a rocket into the sky.'
     },
     {
       id: 'rl-2',
-      question: 'What is a rocket’s "apogee"?',
-      options: ['The highest altitude reached during its flight trajectory', 'The moment of engine ignition', 'The landing touchdown spot', 'The rocket’s maximum speed'],
+      question: 'Which of Newton’s laws explains rocket thrust (Action and Reaction)?',
+      options: ['Third Law', 'First Law', 'Rule of Gravity only', 'Law of Magnetism'],
       correctIndex: 0,
-      explanation: 'Apogee is the highest point of an orbital or suborbital flight before gravity begins pulling the vehicle back down.'
+      explanation: 'Newton’s Third Law states that every action has an equal and opposite reaction!'
     },
     {
       id: 'rl-3',
-      question: 'Why do multi-stage rockets drop empty fuel tanks during flight into space?',
-      options: ['To signal ground observers', 'To discard dead mass and allow remaining stages to accelerate much faster', 'To keep the rocket cool', 'Empty tanks attract space debris'],
-      correctIndex: 1,
-      explanation: 'Discarding empty tanks reduces vehicle mass, dramatically increasing acceleration and efficiency per the Tsiolkovsky rocket equation.'
+      question: 'What is a rocket’s apogee?',
+      options: ['The highest point it reaches in flight', 'The launchpad button', 'The rocket’s name', 'The landing spot'],
+      correctIndex: 0,
+      explanation: 'Apogee is the highest altitude reached before the rocket begins to coast or fall.'
     },
     {
       id: 'rl-4',
-      question: 'What makes up the condensation trails (contrails) left behind high-altitude rocket launches and jet engines?',
-      options: ['Solid iron dust', 'Condensed water vapor droplets and ice crystals', 'Radioactive emissions', 'Pure burning sulfur'],
-      correctIndex: 1,
-      explanation: 'Rocket propellant combustion produces hot water vapor and CO2; in cold upper atmosphere air, water vapor condenses into clouds of ice crystals.'
+      question: 'What happens when a rocket has a bigger fuel tank?',
+      options: ['Its engines can fire for a longer duration', 'It can never lift off', 'It changes color to pink', 'It flies backwards'],
+      correctIndex: 0,
+      explanation: 'More fuel lets engines burn longer, allowing the rocket to fly higher and reach space!'
     },
     {
       id: 'rl-5',
-      question: 'What velocity is required for a rocket to escape Earth’s gravitational pull without further propulsion?',
-      options: ['About 11.2 km/s (Escape Velocity)', '100 km/h', '1.0 km/s', 'Speed of sound (Mach 1)'],
+      question: 'What are the white contrails left behind high rockets made of?',
+      options: ['Frozen water vapor and ice crystals', 'White smoke bombs', 'Flour dust', 'Cotton wool'],
       correctIndex: 0,
-      explanation: 'Earth’s escape velocity is approximately 11.2 kilometers per second (about 40,320 km/h or 25,000 mph).'
+      explanation: 'Hot exhaust water vapor freezes instantly in the freezing upper air into ice crystal trails.'
     },
     {
       id: 'rl-6',
-      question: 'Why must liquid rocket engines carry both fuel AND an oxidizer (like liquid oxygen) in space?',
-      options: ['Space has no atmospheric oxygen to sustain fuel combustion', 'Oxidizers make the rocket look colorful', 'To balance the weight of the wings', 'To prevent fuel from evaporating in the sun'],
+      question: 'Why must space rockets carry their own oxygen tank?',
+      options: ['There is no air or oxygen in space to burn fuel', 'To keep the rocket floating', 'To blow bubbles', 'To cool the wings'],
       correctIndex: 0,
-      explanation: 'Because the vacuum of space contains no oxygen, rockets must carry their own oxidizer to chemically react and burn fuel.'
+      explanation: 'Space is a vacuum without air, so rockets must bring liquid oxygen (oxidizer) to burn their fuel.'
     },
     {
       id: 'rl-7',
-      question: 'What is the aerodynamic purpose of fins on the base of a suborbital rocket?',
-      options: ['To provide lift like an airplane', 'To keep the Center of Pressure behind the Center of Mass for aerodynamic stability', 'To house landing wheels', 'To push contrails sideways'],
-      correctIndex: 1,
-      explanation: 'Fins shift the center of aerodynamic pressure behind the rocket’s center of mass, preventing it from tumbling out of control.'
+      question: 'What do the fins at the bottom of a rocket do?',
+      options: ['Keep the rocket flying straight and stable', 'Act as landing wheels', 'Make the rocket go backwards', 'Store extra water'],
+      correctIndex: 0,
+      explanation: 'Fins act like arrows to keep the rocket pointing forward through the air.'
     },
     {
       id: 'rl-8',
-      question: 'What is "Max Q" during a rocket launch ascent?',
-      options: ['The point of maximum aerodynamic dynamic pressure on the rocket structure', 'The maximum quantity of fuel remaining', 'The moment of quiet communication', 'The maximum engine temperature'],
+      question: 'Why do multi-stage rockets drop empty fuel tanks as they fly?',
+      options: ['To get lighter so they can accelerate faster', 'To send souvenirs back to Earth', 'Because the tanks melt', 'To make room for astronauts'],
       correctIndex: 0,
-      explanation: 'Max Q is when mechanical aerodynamic stress peaks due to high vehicle velocity colliding with dense atmospheric air.'
+      explanation: 'Dropping dead metal weight makes the remaining rocket lighter and much faster!'
     },
     {
       id: 'rl-9',
-      question: 'What is the lowest layer of Earth’s atmosphere where weather happens and launches begin?',
-      options: ['Troposphere', 'Stratosphere', 'Thermosphere', 'Exosphere'],
+      question: 'What is the speed needed to break free from Earth’s gravity called?',
+      options: ['Escape velocity', 'Speed of sound', 'Wind speed', 'Walking pace'],
       correctIndex: 0,
-      explanation: 'The troposphere extends from ground level up to roughly 12 km (7 miles) and contains ~75% of atmospheric air mass.'
+      explanation: 'Escape velocity (about 11 kilometers per second) is needed to leave Earth for deep space.'
     },
     {
       id: 'rl-10',
-      question: 'Why do most orbital space launches head EASTWARD from the launchpad?',
-      options: ['To fly towards the rising sun', 'To take advantage of Earth’s rotational speed boost', 'Because winds always blow eastward', 'Space stations only orbit east-to-west'],
-      correctIndex: 1,
-      explanation: 'Earth rotates from west to east; launching east adds Earth’s rotational surface speed (up to 1,670 km/h at equator) to the rocket.'
+      question: 'What is the imaginary boundary 100 km high where space begins called?',
+      options: ['The Kármán line', 'The finish line', 'The equator', 'The solar ring'],
+      correctIndex: 0,
+      explanation: 'The Kármán line at 100 km altitude marks the official boundary of outer space.'
     },
     {
       id: 'rl-11',
-      question: 'What famous rocket equation relates vehicle mass ratio, exhaust velocity, and delta-v?',
-      options: ['The Tsiolkovsky Rocket Equation', 'The Kepler Equation', 'The Bernoulli Principle', 'The Hubble Law'],
+      question: 'What is the cargo carried by a rocket called (like a satellite or space probe)?',
+      options: ['The payload', 'The launchpad', 'The contrail', 'The engine bell'],
       correctIndex: 0,
-      explanation: 'Konstantin Tsiolkovsky formulated $\\Delta v = v_e \\ln(m_0 / m_f)$, the fundamental governing formula of astronautics.'
+      explanation: 'Payload is the cargo, spacecraft, or astronauts carried on the mission.'
     },
     {
       id: 'rl-12',
-      question: 'What boundary line, located 100 kilometers (62 miles) above sea level, is commonly defined as the edge of space?',
-      options: ['The Kármán Line', 'The Armstrong Limit', 'The Van Allen Belt', 'The Kuiper Boundary'],
+      question: 'What shape is a rocket’s nosecone to cut smoothly through air?',
+      options: ['Pointed and aerodynamic', 'Completely flat like a wall', 'Shaped like a doughnut', 'Square like a box'],
       correctIndex: 0,
-      explanation: 'The Kármán line at 100 km altitude marks where the atmosphere becomes too thin to support aerodynamic flight without orbital speed.'
+      explanation: 'A sleek, pointy nosecone reduces air resistance so the rocket slices easily through the air.'
     },
     {
       id: 'rl-13',
-      question: 'What shaped nozzle is used on rocket engines to expand supersonic exhaust gas efficiently?',
-      options: ['De Laval convergent-divergent nozzle', 'Cylindrical pipe', 'Square funnel', 'Perforated sprinkler'],
+      question: 'What happens to a rocket’s acceleration as its fuel burns and gets used up?',
+      options: ['Acceleration increases because the rocket gets much lighter', 'Acceleration drops to zero immediately', 'The rocket stops moving', 'The rocket turns upside down'],
       correctIndex: 0,
-      explanation: 'A de Laval nozzle narrows to a throat and then flares outward, accelerating hot gas from subsonic to supersonic speeds.'
+      explanation: 'With steady thrust pushing a lighter and lighter rocket, acceleration gets faster and faster!'
     },
     {
       id: 'rl-14',
-      question: 'What is the "payload" of a rocket launch mission?',
-      options: ['The cargo or passengers being transported (e.g. satellite, probe, astronaut crew)', 'The rocket fuel in the lower tank', 'The steel launchpad tower', 'The spent rocket boosters in the ocean'],
+      question: 'Which atmospheric layer do rockets launch through first from the ground?',
+      options: ['The troposphere', 'The ionosphere', 'The magnetosphere', 'The exosphere'],
       correctIndex: 0,
-      explanation: 'The payload is the active mission cargo carried into space, distinct from the vehicle structure and propellant.'
+      explanation: 'The troposphere is the lowest atmospheric layer where weather happens and we live.'
     },
     {
       id: 'rl-15',
-      question: 'What happens to the acceleration of a rocket as its engines fire continuously at constant thrust?',
-      options: ['Acceleration increases because the rocket’s total mass decreases as fuel burns', 'Acceleration decreases to zero', 'Acceleration stays perfectly constant', 'Acceleration oscillates like a pendulum'],
+      question: 'What direction do most rockets launch towards to get a speed boost from Earth’s spin?',
+      options: ['East', 'West', 'North', 'South'],
       correctIndex: 0,
-      explanation: 'According to $a = F / m$, as propellant mass ($m$) is rapidly consumed while thrust ($F$) remains steady, acceleration ($a$) rises.'
-    },
-    {
-      id: 'rl-16',
-      question: 'What causes the colorful "jellyfish effect" often seen during twilight rocket launches?',
-      options: ['High-altitude rocket exhaust catching sunlight against a dark twilight sky', 'Bioluminescent jellyfish in the clouds', 'Engine coolant spraying randomly', 'Atmospheric neon sign reflections'],
-      correctIndex: 0,
-      explanation: 'At dawn or dusk, sunlight illuminates expanding high-altitude exhaust contrails while ground observers are still in darkness.'
+      explanation: 'Earth rotates from west to east, so launching east adds Earth’s rotational speed!'
     }
   ],
 
   'defying-gravity': [
     {
       id: 'dg-1',
-      question: 'What did Galileo Galilei famously demonstrate about falling objects in the absence of air resistance?',
-      options: ['Heavy objects fall much faster than light ones', 'All objects fall with the exact same gravitational acceleration regardless of mass', 'Light objects fall faster because they are nimble', 'Objects only fall if they are metallic'],
-      correctIndex: 1,
-      explanation: 'Galileo proved that gravity accelerates all objects at the same rate regardless of their mass when air drag is removed.'
+      question: 'What is gravity?',
+      options: ['An invisible pulling force between objects with mass', 'A kind of electricity', 'A cold wind', 'A type of gas'],
+      correctIndex: 0,
+      explanation: 'Gravity is the natural pull that attracts objects with mass toward each other.'
     },
     {
       id: 'dg-2',
-      question: 'What is the approximate acceleration due to gravity ($g$) at Earth’s surface?',
-      options: ['9.81 m/s²', '1.62 m/s²', '24.79 m/s²', '100 m/s²'],
+      question: 'What did Galileo discover about falling objects without air resistance?',
+      options: ['All objects fall with the exact same gravity acceleration', 'Heavy objects always fall 10 times faster', 'Feathers float upwards forever', 'Apples only fall at night'],
       correctIndex: 0,
-      explanation: 'Earth’s surface gravity accelerates free-falling objects downward at approximately 9.81 meters per second squared.'
+      explanation: 'Galileo proved that gravity accelerates all objects at the same rate regardless of their weight!'
     },
     {
       id: 'dg-3',
-      question: 'What is "terminal velocity" when an object drops through an atmosphere?',
-      options: ['The speed of light', 'The speed where downward gravity matches upward aerodynamic drag, resulting in constant velocity', 'The moment the object explodes on impact', 'Zero speed when resting on a shelf'],
-      correctIndex: 1,
-      explanation: 'Terminal velocity occurs when the upward drag force ($F_d$) equals the downward gravitational force ($mg$), so net acceleration becomes zero.'
+      question: 'Why does a feather fall slower than a bowling ball on Earth?',
+      options: ['Air resistance pushes up against the wide, light feather', 'The feather has reverse gravity', 'The bowling ball has a motor', 'The feather is scared of falling'],
+      correctIndex: 0,
+      explanation: 'Air pushes against the surface of the feather like a parachute, slowing it down.'
     },
     {
       id: 'dg-4',
-      question: 'During Apollo 15 on the Moon, astronaut David Scott dropped a hammer and a falcon feather. What happened?',
-      options: ['The feather floated away into deep space', 'Both hit the lunar surface at the exact same instant', 'The hammer hit first because it was heavier', 'The feather burned up in lunar air'],
-      correctIndex: 1,
-      explanation: 'Because the Moon has no atmosphere (vacuum), the feather and hammer fell side-by-side and hit the lunar dust simultaneously.'
+      question: 'What happened when astronauts dropped a hammer and a feather on the Moon?',
+      options: ['They both hit the ground at the exact same instant', 'The hammer hit first and the feather floated away', 'The hammer floated into space', 'Both melted'],
+      correctIndex: 0,
+      explanation: 'Because there is no air on the Moon, the hammer and feather fell side-by-side and landed together!'
     },
     {
       id: 'dg-5',
-      question: 'How does the surface gravity on the Moon compare to Earth’s surface gravity?',
-      options: ['It is about 1/6th of Earth’s gravity (~1.62 m/s²)', 'It is exactly double Earth’s gravity', 'It has identical gravity to Earth', 'Moon has zero gravity everywhere'],
+      question: 'How does the Moon’s gravity compare to Earth’s gravity?',
+      options: ['It is about 6 times weaker', 'It is 10 times stronger', 'It is exactly the same', 'The Moon has no gravity at all'],
       correctIndex: 0,
-      explanation: 'Due to the Moon’s smaller mass and radius, lunar surface gravity is roughly 16.5% (about one-sixth) of Earth’s.'
+      explanation: 'The Moon is smaller and has less mass, so its gravity is about one-sixth of Earth’s.'
     },
     {
       id: 'dg-6',
-      question: 'Which planet in our solar system has the strongest surface gravity?',
-      options: ['Mars', 'Jupiter (~24.79 m/s²)', 'Venus', 'Mercury'],
-      correctIndex: 1,
-      explanation: 'Jupiter’s massive planetary bulk generates surface gravity approximately 2.5 times greater than Earth’s.'
+      question: 'Which planet in our solar system has the strongest gravity?',
+      options: ['Jupiter', 'Mars', 'Mercury', 'Venus'],
+      correctIndex: 0,
+      explanation: 'Jupiter is the most massive planet, so it pulls with the strongest gravitational force.'
     },
     {
       id: 'dg-7',
-      question: 'What is the scientific difference between an object’s mass and its weight?',
-      options: ['Mass is the quantity of matter; weight is the gravitational force acting on that mass', 'Mass is measured in pounds; weight is in kilograms', 'Mass changes on every planet; weight stays identical', 'There is no scientific difference'],
+      question: 'What is your weight?',
+      options: ['The measure of gravity pulling down on your mass', 'The number of hairs on your head', 'How tall you are in centimeters', 'The speed you run'],
       correctIndex: 0,
-      explanation: 'Mass is an intrinsic measure of matter (in kg) that never changes, whereas weight is the force ($W = mg$) exerted by gravity.'
+      explanation: 'Mass is the stuff you are made of; weight is how hard gravity pulls on that mass.'
     },
     {
       id: 'dg-8',
-      question: 'If you drop an apple in a vacuum on Earth from rest, how fast is it falling after exactly 2 seconds?',
-      options: ['9.81 m/s', '19.62 m/s', '39.24 m/s', '4.90 m/s'],
-      correctIndex: 1,
-      explanation: 'Using $v = gt$: velocity = $9.81 \\text{ m/s}^2 \\times 2 \\text{ s} = 19.62 \\text{ m/s}$.'
+      question: 'Where on the measuring scale is 0 meters?',
+      options: ['At the bottom (the ground)', 'At the top of the tower', 'In the middle', 'Outside the screen'],
+      correctIndex: 0,
+      explanation: 'We measure height starting at 0 meters on the ground up to the top of the drop tower.'
     },
     {
       id: 'dg-9',
-      question: 'Why does a crumpled ball of paper fall much faster through air than an unfolded flat sheet of identical paper?',
-      options: ['The crumpled ball has more mass', 'The flat sheet has a larger surface area creating much greater air drag', 'Crumpled paper has higher gravitational pull', 'Flat paper generates magnetic levitation'],
-      correctIndex: 1,
-      explanation: 'Both have identical mass and gravity, but the flat sheet’s large cross-sectional area produces far higher aerodynamic drag resistance.'
+      question: 'What happens to the speed of an apple as it falls toward the ground?',
+      options: ['It speeds up more and more until impact', 'It stays at 0 speed the whole time', 'It slows down as it gets closer', 'It stops in mid-air'],
+      correctIndex: 0,
+      explanation: 'Gravity pulls continuously, making the object accelerate and gain speed every second it falls.'
     },
     {
       id: 'dg-10',
-      question: 'Why do astronauts feel "weightless" inside the International Space Station (ISS)?',
-      options: ['There is zero gravity in low Earth orbit', 'The station and astronauts are in continuous free-fall around Earth', 'The space station has anti-gravity shielding', 'Their spacesuits contain helium'],
-      correctIndex: 1,
-      explanation: 'Gravity at ISS altitude is still ~90% of Earth’s surface gravity; astronauts feel weightless because they are in perpetual orbital free fall.'
+      question: 'What is Zero-G (Zero Gravity)?',
+      options: ['When objects float freely without feeling weight', 'When gravity is 100 times stronger', 'A planet made of ice', 'A heavy bowling ball'],
+      correctIndex: 0,
+      explanation: 'In deep space, there is no strong planet pull nearby, so objects float weightlessly.'
     },
     {
       id: 'dg-11',
-      question: 'What mathematical formula calculates the vertical distance ($d$) fallen by an object from rest under gravity in time ($t$)?',
-      options: ['d = ½ × g × t²', 'd = m × g × h', 'd = v / t', 'd = g × t'],
+      question: 'Why do planets orbit the Sun instead of flying off into space?',
+      options: ['The Sun’s huge gravity pulls them into orbital paths', 'Space has giant ropes', 'Planets are pushed by wind', 'Magnets in the planets'],
       correctIndex: 0,
-      explanation: 'The kinematic equation for distance from rest under uniform acceleration is $d = \\frac{1}{2}gt^2$.'
+      explanation: 'The Sun has massive gravity that keeps all the planets orbiting neatly around it.'
     },
     {
       id: 'dg-12',
-      question: 'What would happen to the gravitational force between two planets if the distance between them is doubled?',
-      options: ['The force doubles', 'The force is cut in half', 'The force decreases to 1/4th of its original value', 'The force becomes negative'],
-      correctIndex: 2,
-      explanation: 'Newton’s Inverse-Square Law states gravitational attraction is proportional to $1/r^2$; doubling distance reduces force by $2^2 = 4$.'
+      question: 'If you drop an object from 50 meters instead of 20 meters, what will happen?',
+      options: ['It will take longer to hit and reach a faster speed', 'It will take less time', 'It will never land', 'It will change into water'],
+      correctIndex: 0,
+      explanation: 'A higher drop gives gravity more distance and time to accelerate the object to higher speeds.'
     },
     {
       id: 'dg-13',
-      question: 'How does surface gravity on Mars compare to Earth?',
-      options: ['About 38% of Earth’s gravity (~3.72 m/s²)', 'Equal to Earth', 'Three times stronger than Earth', 'Absolute zero'],
+      question: 'What is "terminal velocity"?',
+      options: ['The steady speed reached when air push balances gravity pull', 'The speed of light', 'When an object hits the floor', 'Zero speed at rest'],
       correctIndex: 0,
-      explanation: 'Mars is smaller and less dense than Earth, providing a surface gravity of roughly 3.72 m/s² (0.38 g).'
+      explanation: 'Once upward air drag matches downward gravity, a falling object stops speeding up.'
     },
     {
       id: 'dg-14',
-      question: 'What instrument in science laboratories is used to measure weight by stretching a calibrated coil spring?',
-      options: ['A spring scale (dynamometer)', 'A graduated cylinder', 'A Bunsen burner', 'A cathode ray tube'],
+      question: 'Why does an anvil fall with great force on the ground?',
+      options: ['It has heavy mass and gravity pulls hard on it', 'It has wings', 'It is made of wood', 'It is filled with helium'],
       correctIndex: 0,
-      explanation: 'A spring scale uses Hooke’s Law ($F = -kx$) to measure gravitational force in Newtons.'
+      explanation: 'The anvil’s high mass gives it significant momentum when pulled downward by gravity.'
     },
     {
       id: 'dg-15',
-      question: 'Why does a skydiver spread their arms and legs into a "belly-to-earth" position?',
-      options: ['To look like an eagle', 'To maximize surface area and increase air resistance to control terminal velocity', 'To catch updrafts and fly upwards', 'To reduce gravitational pull'],
-      correctIndex: 1,
-      explanation: 'Spreading out maximizes drag area ($A$), stabilizing the skydiver and lowering terminal velocity to roughly 200 km/h (120 mph).'
-    },
-    {
-      id: 'dg-16',
-      question: 'What type of hypothetical particle has been theorized in quantum physics as the mediator of gravitational interaction?',
-      options: ['The Graviton', 'The Photon', 'The Gluon', 'The Positron'],
+      question: 'Would a bathroom scale show a smaller number if you weighed yourself on Mars?',
+      options: ['Yes, because Mars gravity is weaker than Earth', 'No, exactly the same', 'It would show infinity', 'It would show zero'],
       correctIndex: 0,
-      explanation: 'In quantum field theory, the graviton is the hypothetical massless spin-2 boson proposed to mediate gravitational interactions.'
+      explanation: 'Because Mars gravity is only about 38% of Earth’s, you would weigh much less on Mars!'
     }
   ]
 };
